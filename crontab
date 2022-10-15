@@ -1,0 +1,1 @@
+* * * * * root /bin/bash -c "/opt/venv/bin/python /opt/updaemon/app/main.py --config /opt/updaemon/updaemon.conf >> /var/log/cron.log 2>&1"

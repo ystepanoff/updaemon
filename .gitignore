@@ -1,5 +1,8 @@
+updaemon.conf
+
+
 # Byte-compiled / optimized / DLL files
-__pycache__/
+ccc__pycache__/
 *.py[cod]
 *$py.class
 

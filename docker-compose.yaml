@@ -1,0 +1,23 @@
+services:
+  updaemon-db:
+    image: mysql:5.7-debian
+    platform: linux/amd64
+    user: "1000:50"
+    volumes:
+      - updaemon-data:/var/lib/mysql
+    environment:
+      - MYSQL_RANDOM_ROOT_PASSWORD=true
+
+  updaemon:
+    build: .
+    command: "cron && tail -f /var/log/cron.log"
+    image: debian:stable
+    depends_on:
+      - updaemon-db
+    tmpfs:
+      - /tmp
+    volumes:
+      - ./:/opt/updaemon
+      
+volumes:
+  updaemon-data: {}
