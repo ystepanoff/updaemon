@@ -8,12 +8,21 @@ services:
     environment:
       - MYSQL_RANDOM_ROOT_PASSWORD=true
 
+  run-migrations:
+    image: debian:stable
+    command: "/opt/venv/bin/python /opt/updaemon/db/run_migrations.py"
+    depends_on:
+      - updaemon-db
+    volumes:
+      - ./:/opt/updaemon
+
   updaemon:
     build: .
     command: "cron && tail -f /var/log/cron.log"
     image: debian:stable
     depends_on:
       - updaemon-db
+      - run-migrations
     tmpfs:
       - /tmp
     volumes:
