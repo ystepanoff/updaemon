@@ -34,5 +34,3 @@ if __name__ == '__main__':
     db_name = config.get('db', 'name')
 
     migrations = find_new_migrations([], args.dir)
-
-
