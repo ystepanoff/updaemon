@@ -1,8 +1,17 @@
+import asyncio
 import aiomysql
 
 
 class DBHandler:
-    def __init__(self, host='updaemon-db', port=3306, user='root', password='', name='updaemon', loop=None):
+    def __init__(
+            self,
+            host: str = 'updaemon-db',
+            port: int = 3306,
+            user: str = 'root',
+            password: str = '',
+            name: str = 'updaemon',
+            loop: asyncio.AbstractEventLoop = None
+    ) -> None:
         self.host = host
         self.port = port
         self.user = user
@@ -12,7 +21,7 @@ class DBHandler:
         self.pool = None
 
 
-    async def setup(self):
+    async def setup(self) -> None:
         self.pool = await aiomysql.create_pool(
             host=self.host,
             port=self.port,
@@ -23,12 +32,12 @@ class DBHandler:
         )
 
 
-    async def destroy(self):
+    async def destroy(self) -> None:
         self.pool.close()
         await self.pool.wait_closed()
 
 
-    async def test_mysql(self):
+    async def test_mysql(self) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("SELECT 42;")

@@ -5,7 +5,7 @@ import asyncio
 from utils.db_handler import DBHandler
 
 
-async def main(loop):
+async def main(loop: asyncio.AbstractEventLoop) -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=True)
     args = parser.parse_args()

@@ -1,7 +1,7 @@
 FROM debian:stable
 
 RUN apt-get -qq -y update \
-    && apt-get -qq -y install locales python3 python3-pip cron \
+    && apt-get -qq -y install nc locales python3 python3-pip cron \
     && apt-get -qq -y autoremove \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \

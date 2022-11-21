@@ -10,7 +10,7 @@ services:
 
   run-migrations:
     image: debian:stable
-    command: "/opt/venv/bin/python /opt/updaemon/db/run_migrations.py"
+    command: "./wait-for updaemon-db:3306 -- /opt/venv/bin/python /opt/updaemon/db/run_migrations.py --config updaemon.conf --dir /opt/updaemon/db/migrations"
     depends_on:
       - updaemon-db
     volumes:
