@@ -1,6 +1,9 @@
 import configparser
 import argparse
 import asyncio
+import logging
+import sys
+from zc.lockfile import LockFile, LockError
 
 from utils.db_handler import DBHandler
 
@@ -11,6 +14,17 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
     args = parser.parse_args()
     config = configparser.ConfigParser()
     config.read(args.config)
+
+    logging.basicConfig(
+        level=logging.DEBUG,
+        format='[%(asctime)s] %(levelname)s - %(message)s',
+    )
+
+    try:
+        lock = LockFile('.lock')
+    except LockError:
+        logging.error('Cannot obtain lock — is the app already running?')
+        sys.exit(0)
 
     db_host = config.get('db', 'host')
     db_user = config.get('db', 'user')
@@ -26,6 +40,8 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
     await db.setup()
 
     await db.test_mysql()
+
+    lock.close()
 
 
 if __name__ == '__main__':

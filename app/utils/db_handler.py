@@ -1,6 +1,8 @@
 import asyncio
 import aiomysql
+import pymysql
 import json
+import logging
 from typing import List, Tuple, Dict, Any
 
 
@@ -21,6 +23,7 @@ class DBHandler:
         self.name = name
         self.loop = loop
         self.pool = None
+        self.logger = logging.getLogger(__name__)
 
     async def setup(self) -> None:
         async def create_pool():
@@ -34,11 +37,14 @@ class DBHandler:
                     loop=self.loop,
                 )
                 return True
-            except aiomysql.err.OperationalError:
+            except pymysql.err.OperationalError:
+                self.logger.error("Cannot connect to the DB!")
                 return False
 
-        while not (await create_pool()):
-            print("Can't connect")
+        while True:
+            try_pool = await create_pool()
+            if try_pool is True:
+                break
             await asyncio.sleep(10)
 
     async def destroy(self) -> None:
