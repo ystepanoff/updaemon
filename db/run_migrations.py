@@ -46,7 +46,7 @@ if __name__ == '__main__':
             connection.select_db(db_name)
             with connection.cursor() as cursor:
                 cursor.execute("SELECT id FROM migrations")
-                existing_migrations = [row[0] for row in cursor.fetchall()]
+                existing_migrations = [id for (id,) in cursor.fetchall()]
                 print("Existing migrations:", existing_migrations)
         except pymysql.err.OperationalError as e:
             error_id, _ = e.args
@@ -57,7 +57,8 @@ if __name__ == '__main__':
         except pymysql.err.ProgrammingError as e:
             error_id, _ = e.args
             if error_id == pymysql.constants.ER.BAD_TABLE_ERROR:
-                pass # there is no migrations table, so start from the very first migration
+                # there is no migrations table, so start from the very first migration
+                pass
         with connection.cursor() as cursor:
             new_migrations = find_new_migrations(existing_migrations, args.dir)
             for id, name, file in new_migrations:

@@ -48,14 +48,12 @@ wait_for() {
   case "$PROTOCOL" in
     tcp)
       if ! command -v nc >/dev/null; then
-        apt-get update
-        apt-get -y install netcat
+        apt-get -qq -y update && apt-get -qq -y install netcat
       fi
       ;;
     wget)
       if ! command -v wget >/dev/null; then
-        apt-get update
-        apt-get -y install wget
+        apt-get -qq -y update && apt-get -qq -y install wget
       fi
       ;;
   esac

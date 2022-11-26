@@ -1,4 +1,6 @@
 updaemon.conf
+docker-compose.yaml
+
 .idea
 
 # Byte-compiled / optimized / DLL files

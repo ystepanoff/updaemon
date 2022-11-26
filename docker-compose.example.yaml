@@ -6,11 +6,11 @@ services:
     volumes:
       - updaemon-data:/var/lib/mysql
     environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=true
+      - MYSQL_ROOT_PASSWORD=<root password>
 
   run-migrations:
     image: debian:stable
-    command: "./wait-for updaemon-db:3306 -- /opt/venv/bin/python /opt/updaemon/db/run_migrations.py --config updaemon.conf --dir /opt/updaemon/db/migrations"
+    command: bash -c ". /opt/updaemon/wait-for updaemon-db:3306 -- /opt/venv/bin/python /opt/updaemon/db/run_migrations.py --config updaemon.conf --dir /opt/updaemon/db/migrations"
     depends_on:
       - updaemon-db
     volumes:
@@ -18,7 +18,7 @@ services:
 
   updaemon:
     build: .
-    command: "cron && tail -f /var/log/cron.log"
+    command: bash -c "cron && tail -F /var/log/cron.log"
     image: debian:stable
     depends_on:
       - updaemon-db
