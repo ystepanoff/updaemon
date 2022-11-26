@@ -65,10 +65,17 @@ class DBHandler:
                 ]
                 return sources
 
-    async def add_source(self, name: str, description: str, params: Dict[str, Any]) -> Tuple[bool, str]:
+    async def add_source(self, name: str, description: str, params: Dict[str, Any]) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                pass
+                await cur.execute("""
+                    INSERT INTO sources (name, description, params)
+                    VALUES (%(name)s, %(description)s, %(params)s)
+                """, {
+                    'name': name,
+                    'description': description,
+                    'params': json.dumps(params),
+                })
 
     async def test_mysql(self) -> None:
         async with self.pool.acquire() as conn:

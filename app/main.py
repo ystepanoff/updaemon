@@ -39,7 +39,8 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
     )
     await db.setup()
 
-    await db.test_mysql()
+    async for source in db.list_sources():
+
 
     lock.close()
 
