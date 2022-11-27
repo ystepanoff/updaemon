@@ -3,7 +3,7 @@ import aiomysql
 import pymysql
 import json
 import logging
-from typing import List, Tuple, Dict, Any
+from typing import List, Tuple, Dict, Any, Optional
 
 
 class DBHandler:
@@ -69,12 +69,38 @@ class DBHandler:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
-                    INSERT INTO sources (name, description, params)
-                    VALUES (%(name)s, %(description)s, %(params)s)
+                    INSERT INTO sources
+                        (name, description, params)
+                    VALUES
+                        (%(name)s, %(description)s, %(params)s)
                 """, {
                     'name': name,
                     'description': description,
                     'params': json.dumps(params),
+                })
+
+    async def latest_state(self, source_id: int) -> Optional[str]:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("SELECT data, updated_at WHERE source_id = %d", (source_id,))
+                if cur.rowcount > 0:
+                    return cur.fetchone()
+                return None
+
+    async def upsert_state(self, source_id: int, state: str) -> None:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    INSERT INTO state
+                        (source_id, state, updated_at)
+                    VALUES
+                        (%(source_id)d, %(state)s, NOW())
+                    ON DUPLICATE KEY UPDATE
+                        state = %(state)s,
+                        updated_at = NOW()
+                """, {
+                    'source_id': source_id,
+                    'state': state,
                 })
 
     async def test_mysql(self) -> None:

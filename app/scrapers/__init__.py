@@ -1,1 +1,1 @@
-from . import test_scraper
+from . import dummy_scraper

@@ -31,5 +31,5 @@ class BaseScraper:
             if self.type == 'html':
                 return get_html()
 
-    def process(self, data: str) -> Any:
+    def process(self, data: str) -> Optiona[str]:
         raise NotImplementedError("Each child class must implement process().")
