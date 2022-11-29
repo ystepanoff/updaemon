@@ -38,14 +38,14 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         loop=loop,
     )
     await db.setup()
+    sources = await db.list_sources()
+    print(sources)
 
+    await db.destroy()
 
     lock.close()
 
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    try:
-        loop.run_until_complete(main(loop))
-    finally:
-        loop.close()
+    loop.run_until_complete(main(loop))

@@ -35,6 +35,7 @@ class DBHandler:
                     password=self.password,
                     db=self.name,
                     loop=self.loop,
+                    autocommit=True,
                 )
                 return True
             except pymysql.err.OperationalError:
@@ -54,7 +55,7 @@ class DBHandler:
     async def list_sources(self) -> List[Tuple[int, str, str, Dict[str, Any]]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("SELECT * FROM source")
+                await cur.execute("SELECT id, name, description, params FROM source")
                 sources = [
                     {
                         'id': source_id,
@@ -69,14 +70,14 @@ class DBHandler:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
-                    INSERT INTO sources
+                    INSERT INTO source
                         (name, description, params)
                     VALUES
                         (%(name)s, %(description)s, %(params)s)
                 """, {
                     'name': name,
                     'description': description,
-                    'params': json.dumps(params),
+                    'params': json.dumps(params, ensure_ascii=False),
                 })
 
     async def latest_state(self, source_id: int) -> Optional[str]:
@@ -94,7 +95,7 @@ class DBHandler:
                     INSERT INTO state
                         (source_id, state, updated_at)
                     VALUES
-                        (%(source_id)d, %(state)s, NOW())
+                        (%(source_id)s, %(state)s, NOW())
                     ON DUPLICATE KEY UPDATE
                         state = %(state)s,
                         updated_at = NOW()
@@ -102,11 +103,3 @@ class DBHandler:
                     'source_id': source_id,
                     'state': state,
                 })
-
-    async def test_mysql(self) -> None:
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("SELECT 42")
-                print(cur.description)
-                (r,) = await cur.fetchone()
-                print(r)
