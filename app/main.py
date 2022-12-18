@@ -4,8 +4,13 @@ import asyncio
 import logging
 import sys
 from zc.lockfile import LockFile, LockError
+from typing import Dict, Any
 
 from utils.db_handler import DBHandler
+
+
+async def process_source(db: DBHandler, source: Dict[str, Any]) -> None:
+    print(source)
 
 
 async def main(loop: asyncio.AbstractEventLoop) -> None:
@@ -38,11 +43,16 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         loop=loop,
     )
     await db.setup()
+
     sources = await db.list_sources()
-    print(sources)
+    tasks = [
+        asyncio.create_task(
+            process_source(db, source)
+        ) for source in sources
+    ]
+    await asyncio.gather(*tasks)
 
     await db.destroy()
-
     lock.close()
 
 

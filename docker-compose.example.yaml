@@ -1,12 +1,16 @@
 services:
   updaemon-db:
-    image: mysql:5.7-debian
+    image: mysql:5.7.37-debian
     platform: linux/amd64
     user: "1000:50"
     volumes:
       - updaemon-data:/var/lib/mysql
     environment:
       - MYSQL_ROOT_PASSWORD=<root password>
+
+  updaemon-smtp:
+    image: namshi/smtp
+    restart: always
 
   run-migrations:
     image: debian:stable

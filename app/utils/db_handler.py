@@ -52,7 +52,7 @@ class DBHandler:
         self.pool.close()
         await self.pool.wait_closed()
 
-    async def list_sources(self) -> List[Tuple[int, str, str, Dict[str, Any]]]:
+    async def list_sources(self) -> List[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("SELECT id, name, description, params FROM source")
