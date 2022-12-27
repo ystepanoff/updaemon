@@ -3,4 +3,5 @@ from .email_action import EmailAction
 
 ACTIONS_REGISTRY = {
     'log': LogAction,
+    'email': EmailAction,
 }

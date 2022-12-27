@@ -85,7 +85,7 @@ class DBHandler:
             async with conn.cursor() as cur:
                 await cur.execute("SELECT data, updated_at FROM state WHERE source_id = %s", (source_id,))
                 if cur.rowcount > 0:
-                    return cur.fetchone()
+                    return await cur.fetchone()
         return None
 
     async def upsert_state(self, source_id: int, state: str) -> None:

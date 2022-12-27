@@ -43,14 +43,14 @@ async def process_source(db: DBHandler, source: Dict[str, Any]) -> None:
         return
     scraper = scrapers.SCRAPERS_REGISTRY[source_scraper](source_name, source['params'])
     new_state = await scraper.scrape()
-    old_state = await db.latest_state(source_id)
+    old_state, updated_at = await db.latest_state(source_id)
     if has_updated(new_state, old_state):
         await db.upsert_state(source_id, new_state)
-        for source_action in source_actions:
+        for source_action, kwargs in source_actions.items():
             if source_action not in actions.ACTIONS_REGISTRY:
                 logging.error('Unknown action %s for source %s.', source_action, source_name)
-            action = actions.ACTIONS_REGISTRY[source_action]()
-            action.action('{} updated: {}'.format(source_name, new_state))
+            action = actions.ACTIONS_REGISTRY[source_action](**kwargs)
+            await action.action(meta='test', message='{} updated: {} (previous update was at {})'.format(source_name, new_state, updated_at))
 
 
 async def main(loop: asyncio.AbstractEventLoop) -> None:
