@@ -1,7 +1,5 @@
-import requests
 from typing import Dict, Any, Optional
 import logging
-
 
 SUPPORTED_TYPES = {
     'html',
@@ -18,18 +16,5 @@ class BaseScraper:
         self.source = params['source']
         self.logger = logging.getLogger(__name__)
 
-    def get_data(self, attempts: int = 5) -> Optional[str]:
-        def get_html() -> str:
-            response = requests.get(self.source)
-            if response.status_code == 200:
-                return response.text
-            else:
-                self.logger.error("Failed to fetch HTML: {}, attempt left: {}.".format(response.code, attempts))
-                return self.get_data(attempts - 1)
-
-        if attempts > 0:
-            if self.type == 'html':
-                return get_html()
-
-    def process(self, data: str) -> Optiona[str]:
-        raise NotImplementedError("Each child class must implement process().")
+    async def scrape(self, attempts: int = 5) -> Optional[str]:
+        raise NotImplementedError("Each child class must implement scrape().")

@@ -83,21 +83,21 @@ class DBHandler:
     async def latest_state(self, source_id: int) -> Optional[str]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("SELECT data, updated_at WHERE source_id = %d", (source_id,))
+                await cur.execute("SELECT data, updated_at FROM state WHERE source_id = %s", (source_id,))
                 if cur.rowcount > 0:
                     return cur.fetchone()
-                return None
+        return None
 
     async def upsert_state(self, source_id: int, state: str) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     INSERT INTO state
-                        (source_id, state, updated_at)
+                        (source_id, data, updated_at)
                     VALUES
                         (%(source_id)s, %(state)s, NOW())
                     ON DUPLICATE KEY UPDATE
-                        state = %(state)s,
+                        data = %(state)s,
                         updated_at = NOW()
                 """, {
                     'source_id': source_id,
