@@ -55,29 +55,30 @@ class DBHandler:
     async def list_sources(self) -> List[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("SELECT id, name, description, params FROM source")
-                sources = [
+                await cur.execute("SELECT id, name, description, type, remote FROM source")
+                return [
                     {
                         'id': source_id,
                         'name': name,
                         'description': description,
-                        'params': json.loads(params),
-                    } for (source_id, name, description, params) in await cur.fetchall()
+                        'type': type_,
+                        'remote': remote,
+                    } for (source_id, name, description, type_, remote) in await cur.fetchall()
                 ]
-                return sources
 
-    async def add_source(self, name: str, description: str, params: Dict[str, Any]) -> None:
+    async def add_source(self, name: str, description: str, type: str, remote: str) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     INSERT INTO source
-                        (name, description, params)
+                        (name, description, type, remote)
                     VALUES
-                        (%(name)s, %(description)s, %(params)s)
+                        (%(name)s, %(description)s, %(type)s, %(remote)s)
                 """, {
                     'name': name,
                     'description': description,
-                    'params': json.dumps(params, ensure_ascii=False),
+                    'type': type,
+                    'remote': remote,
                 })
 
     async def latest_state(self, source_id: int) -> Optional[str]:
@@ -103,3 +104,36 @@ class DBHandler:
                     'source_id': source_id,
                     'state': state,
                 })
+
+    async def find_scraper(self, source_id: int) -> Optional[str]:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    SELECT scraper.base_class, source_scraper.params
+                    FROM scraper
+                    INNER JOIN source_scraper ON scraper.id = source_scraper.scraper_id
+                    WHERE source_scraper.source_id = %(source_id)s
+                """, {
+                    'source_id': source_id,
+                })
+                if cur.rowcount > 0:
+                    return await cur.fetchone()
+        return None
+
+    async def list_actions(self, source_id: int) -> List[Dict[str, Any]]:
+        async with self.pool.acquire() as conn:
+            async with conn.cursor() as cur:
+                await cur.execute("""
+                    SELECT action.base_class, source_action.params
+                    FROM action
+                    INNER JOIN source_action ON action.id = source_action.action_id
+                    WHERE source_action.source_id = %(source_id)s
+                """, {
+                    'source_id': source_id,
+                })
+                return [
+                    {
+                        'base_class': base_class,
+                        'params': json.loads(params),
+                    } for base_class, params in await cur.fetchall()
+                ]

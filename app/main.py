@@ -22,35 +22,8 @@ def has_updated(new_state: str, old_state: str) -> bool:
 
 async def process_source(db: DBHandler, source: Dict[str, Any]) -> None:
     source_id = int(source['id'])
-    source_name = source.get('name', source_id)
-    if 'params' not in source:
-        logging.error('Missing source params for %s.', source_name)
-        return
-    if 'source' not in source['params']:
-        logging.error('Missing source location for %s.', source_name)
-        return
-    source_type = source['params'].get('type', 'html')
-    source_scraper = source['params'].get('scraper', 'dummy')
-    source_actions = source['params'].get('actions', [])
-    if not source_actions:
-        logging.error('No actions specified for %s.', source_name)
-        return
-    if source_type not in scrapers.SUPPORTED_TYPES:
-        logging.error('Source %s type is not supported.', source_name)
-        return
-    if source_scraper not in scrapers.SCRAPERS_REGISTRY:
-        logging.error('Source %s scraper is not supported.', source_name)
-        return
-    scraper = scrapers.SCRAPERS_REGISTRY[source_scraper](source_name, source['params'])
-    new_state = await scraper.scrape()
-    old_state, updated_at = await db.latest_state(source_id)
-    if has_updated(new_state, old_state):
-        await db.upsert_state(source_id, new_state)
-        for source_action, kwargs in source_actions.items():
-            if source_action not in actions.ACTIONS_REGISTRY:
-                logging.error('Unknown action %s for source %s.', source_action, source_name)
-            action = actions.ACTIONS_REGISTRY[source_action](**kwargs)
-            await action.action(meta='test', message='{} updated: {} (previous update was at {})'.format(source_name, new_state, updated_at))
+    scraper = await db.find_scraper(source_id)
+    logging.info(scraper)
 
 
 async def main(loop: asyncio.AbstractEventLoop) -> None:
