@@ -5,12 +5,11 @@ from scrapers.base_scraper import BaseScraper
 
 
 class DummyScraper(BaseScraper):
-    def __init__(self, name: str, params: Dict[str, Any]) -> None:
-        super(DummyScraper, self).__init__(name, params)
-        self.data = None
+    def __init__(self, remote: str, params: Dict[str, Any]) -> None:
+        super(DummyScraper, self).__init__(remote, params)
 
     async def scrape(self, attempts: int = 5) -> Optional[str]:
-        response = requests.get(self.source)
+        response = requests.get(self.remote)
         if response.status_code == 200:
             return response.text
         else:

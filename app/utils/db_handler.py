@@ -81,12 +81,16 @@ class DBHandler:
                     'remote': remote,
                 })
 
-    async def latest_state(self, source_id: int) -> Optional[str]:
+    async def latest_state(self, source_id: int) -> Optional[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("SELECT data, updated_at FROM state WHERE source_id = %s", (source_id,))
                 if cur.rowcount > 0:
-                    return await cur.fetchone()
+                    data, updated_at = await cur.fetchone()
+                    return {
+                        'data': data,
+                        'updated_at': updated_at,
+                    }
         return None
 
     async def upsert_state(self, source_id: int, state: str) -> None:
@@ -105,7 +109,7 @@ class DBHandler:
                     'state': state,
                 })
 
-    async def find_scraper(self, source_id: int) -> Optional[str]:
+    async def find_scraper(self, source_id: int) -> Optional[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
@@ -117,7 +121,11 @@ class DBHandler:
                     'source_id': source_id,
                 })
                 if cur.rowcount > 0:
-                    return await cur.fetchone()
+                    base_class, params = await cur.fetchone()
+                    return {
+                        'base_class': base_class,
+                        'params': json.loads(params),
+                    }
         return None
 
     async def list_actions(self, source_id: int) -> List[Dict[str, Any]]:
