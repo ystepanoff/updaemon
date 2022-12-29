@@ -27,6 +27,13 @@ services:
       - /tmp
     volumes:
       - ./:/opt/updaemon
-      
+
+  web:
+    build: ./web
+    ports:
+      - "8000:5000"
+    volumes:
+      - ./web:/web
+
 volumes:
   updaemon-data: {}
