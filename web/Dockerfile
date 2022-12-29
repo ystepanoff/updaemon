@@ -1,5 +1,6 @@
 FROM python:3.9
 COPY . /opt/web
+COPY ../updaemon.conf /opt/web
 WORKDIR /opt/web
 RUN pip3 install --no-cache-dir -q -U virtualenv
 ENV VIRTUALENV /opt/venv
