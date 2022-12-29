@@ -66,15 +66,11 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         logging.error('Cannot obtain lock — is the app already running?')
         sys.exit(0)
 
-    db_host = config.get('db', 'host')
-    db_user = config.get('db', 'user')
-    db_password = config.get('db', 'password')
-    db_name = config.get('db', 'name')
     db = DBHandler(
-        host=db_host,
-        user=db_user,
-        password=db_password,
-        name=db_name,
+        host=config.get('db', 'host'),
+        user=config.get('db', 'user'),
+        password=config.get('db', 'password'),
+        name=config.get('db', 'name'),
         loop=loop,
     )
     await db.setup()
