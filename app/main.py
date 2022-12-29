@@ -32,7 +32,6 @@ async def process_source(db: DBHandler, source: Dict[str, Any]) -> None:
                 params=scraper_data.get('params', {})
             )
             new_state = await scraper.scrape()
-            logging.info(new_state)
             if has_updated(new_state, old_state['data']):
                 actions_data = await db.list_actions(source_id)
                 for action_data in actions_data:
