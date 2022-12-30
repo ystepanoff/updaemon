@@ -4,4 +4,28 @@
 <h1 class="title">
   Welcome, {{ name }}!
 </h1>
+<div class="box">
+  <table class="table is-striped is-narrow is-hoverable is-fullwidth">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Remote</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for source in sources %}
+      <tr>
+        <td><a href="/source?id={{ source['id'] }}" class="has-text-info">{{ source['name'] }}</a></td>
+        <td>{{ source['description'] }}</td>
+        <td><a href="{{ source['remote'] }}" class="has-text-info" target="_blank">{{ source['remote'] }}</a></td>
+        <td><button class="delete is-medium"></button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <a href="/addsource" class="button is-centered">Add new source</a>
+</div>
+
 {% endblock %}

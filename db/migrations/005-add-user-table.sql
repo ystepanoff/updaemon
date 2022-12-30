@@ -4,4 +4,4 @@ CREATE TABLE user (
     password VARCHAR(255),
     name VARCHAR(255),
     PRIMARY KEY (id)
-)
+);

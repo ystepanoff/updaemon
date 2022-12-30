@@ -10,6 +10,12 @@ class User(UserMixin):
         self.password = password
         self.name = name
 
+    def get_id(self) -> Optional[int]:
+        with db.get_db().cursor() as cur:
+            cur.execute("SELECT id FROM user WHERE email = %s", self.email)
+            (self.id,) = cur.fetchone()
+        return self.id
+
     def exists(self) -> bool:
         result = False
         with db.get_db().cursor() as cur:
@@ -32,6 +38,18 @@ class User(UserMixin):
                 'name': self.name,
             })
 
+    def list_sources(self):
+        with db.get_db().cursor() as cur:
+            cur.execute("SELECT id, name, description, remote FROM source WHERE user_id = %s", self.get_id())
+            return [
+                {
+                    'id': id,
+                    'name': name,
+                    'description': description,
+                    'remote': remote,
+                } for id, name, description, remote in cur.fetchall()
+            ]
+
 
 def find_user_by_id(user_id: int) -> Optional[User]:
     with db.get_db().cursor() as cur:
@@ -39,4 +57,3 @@ def find_user_by_id(user_id: int) -> Optional[User]:
         if cur.rowcount > 0:
             return User(*cur.fetchone())
     return None
-

@@ -10,6 +10,5 @@ CREATE TABLE source (
     description TEXT,
     type VARCHAR(255),
     remote VARCHAR(255),
-    PRIMARY KEY(id),
-    UNIQUE KEY(name)
+    PRIMARY KEY(id)
 );
