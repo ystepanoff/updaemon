@@ -33,10 +33,10 @@ def create_app() -> Flask:
     login_manager.login_view = 'auth.login'
     login_manager.init_app(app)
 
-    from .models import find_user_by_id
+    from .models import User
 
     @login_manager.user_loader
-    def load_user(user_id):
-        return find_user_by_id(int(user_id))
+    def load_user(user_id: int) -> User:
+        return User.from_id(user_id)
 
     return app
