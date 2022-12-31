@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="title">
+    {{ source.name }}
+</h1>
+<div class="box">
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Remote</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><input class="input" type="text" name="name" value="{{ source.name }}" /></td>
+                <td><input class="input" type="text" name="description" value="{{ source.description }}" /></td>
+                <td><input class="input" type="text" name="remote" value="{{ source.remote }}" /></td>
+            </tr>
+
+            <tr>
+                <td></td>
+                <td></td>
+                <td class="has-text-right"><button class="button">Save source</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<h1 class="title">
+    Edit actions
+</h1>
+<div class="box">
+    <table class="table is-fullwidth">
+        <thead>
+            <tr>
+                <th>Base action</th>
+                <th>Params</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for action in actions %}
+            <tr>
+                <td>
+                    <div class="select is-fullwidth">
+                        <select>
+                            {% for base_action in base_actions %}
+                            {% if base_action['base_class'] == action.base_class %}
+                            <option selected>{{ base_action['base_class'] }}</option>
+                            {% else %}
+                            <option>{{ base_action['base_class'] }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </td>
+                <td><input class="input" type="text" name="description" value="{{ action.params }}" /></td>
+            </tr>
+            {% endfor %}
+            <tr>
+                <td><button class="button">Add action</button></td>
+                <td class="has-text-right"><button class="button">Save changes</button></td>
+            </tr>
+        </tbody>
+    </table>
+</div>
+{% endblock %}
