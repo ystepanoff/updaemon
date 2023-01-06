@@ -1,4 +1,5 @@
 FROM python:3.9
+ARG CACHEBUST=1
 COPY ./web /opt/web
 COPY ./updaemon.conf /opt/updaemon.conf
 WORKDIR /opt/web
