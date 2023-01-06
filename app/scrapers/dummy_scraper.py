@@ -15,4 +15,4 @@ class DummyScraper(BaseScraper):
         else:
             self.logger.error("Failed to fetch HTML: {}, attempts left: {}.".format(response.status_code, attempts))
             if attempts > 0:
-                return await self.fetch(attempts - 1)
+                return await self.scrape(attempts - 1)
