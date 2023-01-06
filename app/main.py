@@ -1,3 +1,4 @@
+from typing import Dict, Any
 import configparser
 import argparse
 import asyncio
@@ -6,9 +7,8 @@ import traceback
 import sys
 from hashlib import sha512
 from zc.lockfile import LockFile, LockError
-from typing import Dict, Any
 
-from utils.db_handler import DBHandler
+from utils.db_handler import DBParams, DBHandler
 import actions
 import scrapers
 
@@ -48,7 +48,7 @@ async def process_source(db: DBHandler, source: Dict[str, Any]) -> None:
         logging.error('Could not find any scrapers for source %s.', source_id)
 
 
-async def main(loop: asyncio.AbstractEventLoop) -> None:
+async def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument('--config', type=str, required=True)
     args = parser.parse_args()
@@ -67,11 +67,12 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
         sys.exit(0)
 
     db = DBHandler(
-        host=config.get('db', 'host'),
-        user=config.get('db', 'user'),
-        password=config.get('db', 'password'),
-        name=config.get('db', 'name'),
-        loop=loop,
+        params=DBParams(
+            host=config.get('db', 'host'),
+            user=config.get('db', 'user'),
+            password=config.get('db', 'password'),
+            name=config.get('db', 'name'),
+        ),
     )
     await db.setup()
 
@@ -89,4 +90,4 @@ async def main(loop: asyncio.AbstractEventLoop) -> None:
 
 if __name__ == '__main__':
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main(loop))
+    loop.run_until_complete(main())
