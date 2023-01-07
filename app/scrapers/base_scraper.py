@@ -7,5 +7,5 @@ class BaseScraper:
         self.params = params
         self.logger = logging.getLogger(__name__)
 
-    async def scrape(self, remote: str, attempts: int = 5) -> Optional[str]:
+    async def scrape(self, attempts: int, timeout: int) -> Optional[str]:
         raise NotImplementedError("Each child class must implement scrape().")
