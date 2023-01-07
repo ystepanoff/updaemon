@@ -5,6 +5,13 @@
     {{ source.name }}
 </h1>
 <div class="box">
+    <div id="saveSourceFailed" class="notification is-danger is-hidden">
+        Failed to save the source.
+    </div>
+    <div id="saveSourceSuccess" class="notification is-success is-hidden">
+        Successfully saved the source.
+    </div>
+    <input id="sourceId" type="hidden" value="{{ source_id }}" />
     <table class="table is-fullwidth">
         <thead>
             <tr>
@@ -15,15 +22,17 @@
         </thead>
         <tbody>
             <tr>
-                <td><input class="input" type="text" name="name" value="{{ source.name }}" /></td>
-                <td><input class="input" type="text" name="description" value="{{ source.description }}" /></td>
-                <td><input class="input" type="text" name="remote" value="{{ source.remote }}" /></td>
+                <td><input id="sourceName" class="input" type="text" name="name" value="{{ source.name }}" /></td>
+                <td><input id="sourceDescription" class="input" type="text" name="description" value="{{ source.description }}" /></td>
+                <td><input id="sourceRemote" class="input" type="text" name="remote" value="{{ source.remote }}" /></td>
             </tr>
 
             <tr>
                 <td></td>
                 <td></td>
-                <td class="has-text-right"><button class="button">Save source</button></td>
+                <td class="has-text-right">
+                    <button id="saveSourceButton" class="button">Save source</button>
+                </td>
             </tr>
         </tbody>
     </table>

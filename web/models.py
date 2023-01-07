@@ -104,19 +104,18 @@ class Source:
                 } for action_id, base_class, params in cur.fetchall()
             ]
 
-    def persist(self) -> None:
+    def update(self, source_id: int) -> None:
         with db.get_db().cursor() as cur:
             cur.execute("""
-                INSERT INTO source
-                    (user_id, name, description, remote)
-                VALUES
-                    (%(user_id)s, %(name)s, %(description)s, %(remote)s)
-                ON DUPLICATE KEY UPDATE
+                UPDATE source
+                SET
                     user_id = %(user_id)s,
                     name = %(name)s,
                     description = %(description)s,
                     remote = %(remote)s
+                WHERE id = %(source_id)s
             """, {
+                'source_id': source_id,
                 'user_id': self.user_id,
                 'name': self.name,
                 'description': self.description,
