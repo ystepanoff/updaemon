@@ -4,6 +4,7 @@
 <h1 class="title">
     {{ source.name }}
 </h1>
+<input id="sourceId" type="hidden" value="{{ source_id }}" />
 <div class="box">
     <div id="saveSourceFailed" class="notification is-danger is-hidden">
         Failed to save the source.
@@ -11,7 +12,6 @@
     <div id="saveSourceSuccess" class="notification is-success is-hidden">
         Successfully saved the source.
     </div>
-    <input id="sourceId" type="hidden" value="{{ source_id }}" />
     <table class="table is-fullwidth">
         <thead>
             <tr>

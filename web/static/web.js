@@ -1,8 +1,8 @@
 $(document).ready(function() {
-    var saveSourceButton = $('#saveSourceButton');
+    let saveSourceButton = $('#saveSourceButton');
     if (saveSourceButton.length) {
-        var saveSourceFailed = $('#saveSourceFailed');
-        var saveSourceSuccess = $('#saveSourceSuccess');
+        let saveSourceFailed = $('#saveSourceFailed');
+        let saveSourceSuccess = $('#saveSourceSuccess');
         saveSourceButton.click(function () {
             $.post(
                 "/source",
