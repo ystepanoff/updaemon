@@ -1,39 +1,40 @@
+from typing import List, Dict, Any, Optional
+from dataclasses import dataclass
+import logging
+import json
 import asyncio
 import aiomysql
 import pymysql
-import json
-import logging
-from typing import List, Tuple, Dict, Any, Optional
+
+
+@dataclass
+class DBParams:
+    host: str = 'updaemon-db'
+    port: str = 3306
+    user: str = 'root'
+    password: str = ''
+    name: str = 'updaemon'
 
 
 class DBHandler:
     def __init__(
             self,
-            host: str = 'updaemon-db',
-            port: int = 3306,
-            user: str = 'root',
-            password: str = '',
-            name: str = 'updaemon',
-            loop: asyncio.AbstractEventLoop = None,
+            params: DBParams,
     ) -> None:
-        self.host = host
-        self.port = port
-        self.user = user
-        self.password = password
-        self.name = name
-        self.loop = loop
-        self.pool = None
+        self.params = params
+        self.loop = asyncio.get_event_loop()
         self.logger = logging.getLogger(__name__)
+        self.pool = None
 
     async def setup(self) -> None:
         async def create_pool():
             try:
                 self.pool = await aiomysql.create_pool(
-                    host=self.host,
-                    port=self.port,
-                    user=self.user,
-                    password=self.password,
-                    db=self.name,
+                    host=self.params.host,
+                    port=self.params.port,
+                    user=self.params.user,
+                    password=self.params.password,
+                    db=self.params.name,
                     loop=self.loop,
                     autocommit=True,
                 )
@@ -66,25 +67,27 @@ class DBHandler:
                     } for (source_id, name, description, type_, remote) in await cur.fetchall()
                 ]
 
-    async def add_source(self, name: str, description: str, type: str, remote: str) -> None:
+    async def add_source(self, name: str, description: str, type_: str, remote: str) -> None:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     INSERT INTO source
-                        (name, description, type, remote)
+                        (name, description, type_, remote)
                     VALUES
                         (%(name)s, %(description)s, %(type)s, %(remote)s)
                 """, {
                     'name': name,
                     'description': description,
-                    'type': type,
+                    'type': type_,
                     'remote': remote,
                 })
 
     async def latest_state(self, source_id: int) -> Optional[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("SELECT data, updated_at FROM state WHERE source_id = %s", (source_id,))
+                await cur.execute("""
+                    SELECT data, updated_at FROM state WHERE source_id = %s
+                """, (source_id,))
                 if cur.rowcount > 0:
                     data, updated_at = await cur.fetchone()
                     return {

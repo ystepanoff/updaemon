@@ -1,11 +1,10 @@
-import asyncio
-from aiosmtplib import SMTP, send
+from typing import Any
 from email.message import EmailMessage
-from typing import List
+from aiosmtplib import send
 
 
 class EmailAction:
-    def __init__(self, **kwargs) -> None:
+    def __init__(self, **kwargs: Any) -> None:
         self.recipients = kwargs.get('recipients', [])
         self.hostname = kwargs.get('hostname', 'localhost')
         self.port = kwargs.get('port', 25)
