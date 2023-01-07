@@ -135,7 +135,7 @@ class DBHandler:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
-                    SELECT action.base_class, source_action.params
+                    SELECT action.base_class, COALESCE(action.params_config, '{}'), source_action.params
                     FROM action
                     INNER JOIN source_action ON action.id = source_action.action_id
                     WHERE source_action.source_id = %(source_id)s
@@ -145,6 +145,7 @@ class DBHandler:
                 return [
                     {
                         'base_class': base_class,
+                        'params_config': json.loads(params_config),
                         'params': json.loads(params),
-                    } for base_class, params in await cur.fetchall()
+                    } for base_class, params_config, params in await cur.fetchall()
                 ]

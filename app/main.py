@@ -35,7 +35,19 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
             if has_updated(new_state, old_state['data']):
                 actions_data = await db_handler.list_actions(source_id)
                 for action_data in actions_data:
-                    action = getattr(actions, action_data['base_class'])(**action_data['params'])
+                    base_class = action_data.get('base_class')
+                    params_config = action_data.get('params_config', {})
+                    params = action_data.get('params', {})
+                    if any(param not in params for param in params_config):
+                        logging.error('Missing parameters for %s', base_class)
+                        continue
+                    if any(
+                        params_config[param] != str(type(params[param]).__name__)
+                        for param in params
+                    ):
+                        logging.error('Parameter type mismatch for %s', base_class)
+                        continue
+                    action = getattr(actions, base_class)(**params)
                     await action.action(
                         meta='Updated: {}'.format(source['remote']),
                         message='Updated: {}'.format(source['remote']),

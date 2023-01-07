@@ -6,7 +6,7 @@ from scrapers.base_scraper import BaseScraper
 
 class DummyScraper(BaseScraper):
     def __init__(self, remote: str, params: Dict[str, Any]) -> None:
-        super(DummyScraper).__init__(remote, params)
+        super().__init__(remote, params)
 
     async def scrape(self, attempts: int = 5, timeout: int = 60) -> Optional[str]:
         response = requests.get(self.remote, timeout=timeout)
