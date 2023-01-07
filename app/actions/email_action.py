@@ -2,9 +2,12 @@ from typing import Any
 from email.message import EmailMessage
 from aiosmtplib import send
 
+from actions.base_action import BaseAction
 
-class EmailAction:
+
+class EmailAction(BaseAction):
     def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
         self.recipients = kwargs.get('recipients', [])
         self.hostname = kwargs.get('hostname', 'localhost')
         self.port = kwargs.get('port', 25)
