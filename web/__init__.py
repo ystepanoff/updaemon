@@ -40,4 +40,3 @@ def create_app() -> Flask:
         return User.from_id(user_id)
 
     return app
-

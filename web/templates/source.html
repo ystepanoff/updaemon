@@ -65,10 +65,9 @@
                         </select>
                     </div>
                 </td>
-                <!--<td><input class="input" type="text" name="description" value="{{ action.params }}" /></td>-->
                 <td>
                     <input id="actionParamsConfig-{{ action.id }}" type="hidden" value="{{ action.params_config }}" />
-                    <button id="configureActionButton-{{ source_id }}-{{ action.id }}" class="button is-fullwidth">Configure action</button>
+                    <button id="configureActionButton-{{ action.id }}" class="button is-fullwidth">Configure action</button>
                 </td>
             </tr>
             {% endfor %}
@@ -79,4 +78,26 @@
         </tbody>
     </table>
 </div>
+<section id="modals">
+    {% for action in actions %}
+    <div id="actionModal-{{ action.id }}" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edit {{ action.base_class }}</p>
+                <button id="cancelSaveActionIcon-{{ action.id }}" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="content has-text-black">
+                    <textarea id="actionParams-{{ action.id }}" class="textarea" placeholder="{}">{{ action.params }}</textarea>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button id="saveAction-{{ action.id }}" class="button is-success">Save changes</button>
+                <button id="cancelSaveAction-{{ action.id }}" class="button">Cancel</button>
+            </footer>
+        </div>
+    </div>
+    {% endfor %}
+</section>
 {% endblock %}

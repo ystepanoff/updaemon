@@ -1,6 +1,8 @@
+import json
 from flask import Blueprint, render_template, request, flash
 from flask_login import login_required, current_user
-from .models import Source, Action
+
+from .models import Source, Action, SourceAction
 
 
 main = Blueprint('main', __name__)
@@ -19,6 +21,7 @@ def profile() -> str:
         name=current_user.name,
         sources=current_user.list_sources(),
     )
+
 
 @main.route('/source', methods=['GET'])
 @login_required
@@ -41,6 +44,7 @@ def source_get() -> str:
         sources=current_user.list_sources(),
     )
 
+
 @main.route('/source', methods=['POST'])
 @login_required
 def source_post() -> str:
@@ -51,4 +55,17 @@ def source_post() -> str:
         source.description = str(request.form.get('description'))
         source.remote = str(request.form.get('remote'))
         source.update(source_id)
+    return ''
+
+
+@main.route('/action', methods=['POST'])
+@login_required
+def action_post() -> str:
+    source_id = int(request.form.get('source_id'))
+    action_id = int(request.form.get('action_id'))
+    params = json.loads(request.form.get('params'))
+    source = Source.from_id(source_id, current_user.get_id())
+    if source:
+        source_action = SourceAction(source_id, action_id, params)
+        source_action.persist()
     return ''

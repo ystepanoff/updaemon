@@ -1,12 +1,14 @@
 from __future__ import annotations
-from flask_login import UserMixin
 from typing import Optional, List, Dict, Any
-from web import db
+from flask_login import UserMixin
+import json
+
+from . import db
 
 
 class User(UserMixin):
     def __init__(self, email: str, password: str = None, name: str = None) -> None:
-        self.id = None
+        self.user_id = None
         self.email = email
         self.password = password
         self.name = name
@@ -22,15 +24,15 @@ class User(UserMixin):
     def get_id(self) -> Optional[int]:
         with db.get_db().cursor() as cur:
             cur.execute("SELECT id FROM user WHERE email = %s", self.email)
-            (self.id,) = cur.fetchone()
-        return self.id
+            (self.user_id,) = cur.fetchone()
+        return self.user_id
 
     def exists(self) -> bool:
         result = False
         with db.get_db().cursor() as cur:
             cur.execute("SELECT id, password, name FROM user WHERE email = %s", self.email)
             if cur.rowcount > 0:
-                self.id, self.password, self.name = cur.fetchone()
+                self.user_id, self.password, self.name = cur.fetchone()
                 result = True
         return result
 
@@ -52,11 +54,11 @@ class User(UserMixin):
             cur.execute("SELECT id, name, description, remote FROM source WHERE user_id = %s", self.get_id())
             return [
                 {
-                    'id': id,
+                    'id': source_id,
                     'name': name,
                     'description': description,
                     'remote': remote,
-                } for id, name, description, remote in cur.fetchall()
+                } for source_id, name, description, remote in cur.fetchall()
             ]
 
 
@@ -140,3 +142,22 @@ class Action:
                     'base_class': base_class,
                 } for action_id, base_class in cur.fetchall()
             ]
+
+
+class SourceAction:
+    def __init__(self, source_id: int, action_id: int, params: Dict[str, Any]) -> None:
+        self.source_id = int(source_id)
+        self.action_id = int(action_id)
+        self.params = params
+
+    def persist(self):
+        with db.get_db().cursor() as cur:
+            cur.execute("""
+                INSERT INTO source_action (source_id, action_id, params)
+                VALUES (%(source_id)s, %(action_id)s, %(params)s)
+                ON DUPLICATE KEY UPDATE source_action.params = %(params)s
+            """, {
+                'source_id': self.source_id,
+                'action_id': self.action_id,
+                'params': json.dumps(self.params),
+            })

@@ -8,12 +8,13 @@ import pymysql.cursors
 
 def find_new_migrations(existing_migrations: List[int], migrations_dir: str) -> List[tuple]:
     migrations = []
+    print(existing_migrations)
     for migration_file in os.listdir(migrations_dir):
         match = re.match(r'(\d{3})-(.*).sql$', migration_file)
         if match:
             migration_id = int(match[1])
             migration_name = match[2]
-            if id not in existing_migrations:
+            if migration_id not in existing_migrations:
                 migrations.append((migration_id, migration_name, migration_file))
     if migrations:
         print('Found new migrations:')
