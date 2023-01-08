@@ -84,24 +84,27 @@ class Source:
         return None
 
     @classmethod
-    def list_actions(cls, source_id: int) -> List[Dict[str, Any]]:
+    def list_actions(cls, source_id: int, user_id: int) -> List[Dict[str, Any]]:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
-                    action.id, action.base_class, source_action.params
+                    action.id, action.base_class, COALESCE(action.params_config, '{}'), source_action.params
                 FROM action
                 INNER JOIN source_action
                 ON action.id = source_action.action_id
                 WHERE source_id = %(source_id)s
+                AND source_id in (SELECT id FROM source WHERE user_id = %(user_id)s)
             """, {
                 'source_id': source_id,
+                'user_id': user_id,
             })
             return [
                 {
                     'id': action_id,
                     'base_class': base_class,
+                    'params_config': params_config,
                     'params': params,
-                } for action_id, base_class, params in cur.fetchall()
+                } for action_id, base_class, params_config, params in cur.fetchall()
             ]
 
     def update(self, source_id: int) -> None:

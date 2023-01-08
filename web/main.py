@@ -24,13 +24,14 @@ def profile() -> str:
 @login_required
 def source_get() -> str:
     source_id = int(request.args.get('id'))
-    source = Source.from_id(source_id, current_user.get_id())
+    user_id = int(current_user.get_id())
+    source = Source.from_id(source_id, user_id)
     if source is not None:
         return render_template(
             'source.html',
             source_id=source_id,
             source=source,
-            actions=Source.list_actions(source_id),
+            actions=Source.list_actions(source_id, user_id),
             base_actions=Action.list_base_actions(),
         )
     flash('Source not found.')

@@ -1,5 +1,7 @@
 $(document).ready(function() {
     let saveSourceButton = $('#saveSourceButton');
+    let configureActionButtons = $('[id^="configureActionButton-"]');
+
     if (saveSourceButton.length) {
         let saveSourceFailed = $('#saveSourceFailed');
         let saveSourceSuccess = $('#saveSourceSuccess');
@@ -36,5 +38,17 @@ $(document).ready(function() {
                 )
             });
         });
+    }
+
+    if (configureActionButtons.length) {
+        for (const configureActionButton of configureActionButtons) {
+            $('#' + configureActionButton.id).click(function () {
+                let parts = configureActionButton.id.split('-');
+                let source_id = parseInt(parts[1]);
+                let action_id = parseInt(parts[2]);
+                let params_config = jQuery.parseJSON($('#actionParamsConfig-' + action_id).val());
+                console.log(params_config);
+            });
+        }
     }
 });

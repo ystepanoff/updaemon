@@ -52,6 +52,7 @@
             {% for action in actions %}
             <tr>
                 <td>
+
                     <div class="select is-fullwidth">
                         <select>
                             {% for base_action in base_actions %}
@@ -64,7 +65,11 @@
                         </select>
                     </div>
                 </td>
-                <td><input class="input" type="text" name="description" value="{{ action.params }}" /></td>
+                <!--<td><input class="input" type="text" name="description" value="{{ action.params }}" /></td>-->
+                <td>
+                    <input id="actionParamsConfig-{{ action.id }}" type="hidden" value="{{ action.params_config }}" />
+                    <button id="configureActionButton-{{ source_id }}-{{ action.id }}" class="button is-fullwidth">Configure action</button>
+                </td>
             </tr>
             {% endfor %}
             <tr>
