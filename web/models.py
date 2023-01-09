@@ -127,6 +127,20 @@ class Source:
                 'remote': self.remote,
             })
 
+    def save(self):
+        with db.get_db().cursor() as cur:
+            cur.execute("""
+                INSERT INTO source
+                    (user_id, name, description, remote)
+                VALUES
+                    (%(user_id)s, %(name)s, %(description)s, %(remote)s)
+            """, {
+                'user_id': self.user_id,
+                'name': self.name,
+                'description': self.description,
+                'remote': self.remote,
+            })
+
 
 class Action:
     def __init__(self, base_class: str) -> None:

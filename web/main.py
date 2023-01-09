@@ -48,14 +48,22 @@ def source_get() -> str:
 @main.route('/source', methods=['POST'])
 @login_required
 def source_post() -> str:
-    source_id = int(request.form.get('id'))
-    source = Source.from_id(source_id, current_user.get_id())
-    if source is not None:
-        source.name = request.form.get('name')
-        source.description = str(request.form.get('description'))
-        source.remote = str(request.form.get('remote'))
-        source.update(source_id)
+    source_id = request.form.get('id')
+    if source_id is not None:
+        source = Source.from_id(int(source_id), current_user.get_id())
+        if source is not None:
+            source.name = request.form.get('name')
+            source.description = str(request.form.get('description'))
+            source.remote = str(request.form.get('remote'))
+            source.update(source_id)
+    else:
+        name = request.form.get('name')
+        description = request.form.get('description')
+        remote = request.form.get('remote')
+        source = Source(current_user.get_id(), name, description, remote)
+        source.save()
     return ''
+
 
 
 @main.route('/action', methods=['POST'])

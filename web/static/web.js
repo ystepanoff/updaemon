@@ -2,6 +2,7 @@ $(document).ready(function() {
     let saveSourceButton = $('#saveSourceButton');
     let configureActionButtons = $('[id^="configureActionButton-"]');
     let actionModals = $('[id^="actionModal-"]');
+    let addSourceButton = $('#addSourceButton');
 
     if (saveSourceButton.length) {
         let saveSourceFailed = $('#saveSourceFailed');
@@ -79,7 +80,32 @@ $(document).ready(function() {
             let params_config = $.parseJSON($('#actionParamsConfig-' + action_id).val());
             let modal = $('#actionModal-' + action_id)
             modal.addClass('is-active');
+        });
+    }
 
+    if (addSourceButton.length) {
+        addSourceButton.click(function () {
+            let modal = $('#addSourceModal');
+            modal.addClass('is-active');
+            modal.find('#addSourceCancel').click(() => modal.removeClass('is-active'));
+            modal.find('#addSourceCancelIcon').click(() => modal.removeClass('is-active'));
+            modal.find('#addSourceSave').click(function () {
+                let name = modal.find('#addSourceName').val();
+                let description = modal.find('#addSourceDescription').val();
+                let remote = modal.find('#addSourceRemote').val();
+                $.post(
+                    "/source",
+                    {
+                        "name": name,
+                        "description": description,
+                        "remote": remote
+                    },
+                    () => modal.removeClass('is-active')
+                ).fail(function (xhr, status, error) {
+                    alert(error);
+                    modal.removeClass('is-active');
+                });
+            });
         });
     }
 });

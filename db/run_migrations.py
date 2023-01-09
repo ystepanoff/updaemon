@@ -9,7 +9,7 @@ import pymysql.cursors
 def find_new_migrations(existing_migrations: List[int], migrations_dir: str) -> List[tuple]:
     migrations = []
     print(existing_migrations)
-    for migration_file in os.listdir(migrations_dir):
+    for migration_file in sorted(os.listdir(migrations_dir)):
         match = re.match(r'(\d{3})-(.*).sql$', migration_file)
         if match:
             migration_id = int(match[1])

@@ -31,8 +31,49 @@
             </tr>
             {% endfor %}
         </tbody>
+        <tfoot>
+            <tr>
+                <td><button id="addSourceButton" class="button">Add new source</button></td>
+                <td></td>
+                <td></td>
+                <td></td>
+            </tr>
+        </tfoot>
     </table>
-  <a href="/addsource" class="button is-centered">Add new source</a>
 </div>
-
+<section id="modals">
+    <div id="addSourceModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Add new source</p>
+                <button id="addSourceCancelIcon" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="content has-text-black">
+                    <table class="table is-narrow is-hoverable is-fullwidth">
+                        <tbody>
+                            <tr>
+                                <td>Name:</td>
+                                <td><input id="addSourceName" type="text" class="input" name="name" /></td>
+                            </tr>
+                            <tr>
+                                <td>Description:</td>
+                                <td><input id="addSourceDescription" type="text" class="input" name="description" /></td>
+                            </tr>
+                            <tr>
+                                <td>Remote:</td>
+                                <td><input id="addSourceRemote" type="text" class="input" name="remote" /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button id="addSourceSave" class="button is-success">Save</button>
+                <button id="addSourceCancel" class="button">Cancel</button>
+            </footer>
+        </div>
+    </div>
+</section>
 {% endblock %}
