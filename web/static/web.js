@@ -3,6 +3,7 @@ $(document).ready(function() {
     let configureActionButtons = $('[id^="configureActionButton-"]');
     let actionModals = $('[id^="actionModal-"]');
     let addSourceButton = $('#addSourceButton');
+    let addActionButton = $('#addActionButton');
 
     if (saveSourceButton.length) {
         let saveSourceFailed = $('#saveSourceFailed');
@@ -67,7 +68,6 @@ $(document).ready(function() {
                 });
             } catch (exception) {
                 alert(exception.toString());
-                return;
             }
         });
     }
@@ -84,28 +84,46 @@ $(document).ready(function() {
     }
 
     if (addSourceButton.length) {
+        let modal = $('#addSourceModal');
+        modal.find('#addSourceCancel').click(() => modal.removeClass('is-active'));
+        modal.find('#addSourceCancelIcon').click(() => modal.removeClass('is-active'));
         addSourceButton.click(function () {
-            let modal = $('#addSourceModal');
             modal.addClass('is-active');
-            modal.find('#addSourceCancel').click(() => modal.removeClass('is-active'));
-            modal.find('#addSourceCancelIcon').click(() => modal.removeClass('is-active'));
-            modal.find('#addSourceSave').click(function () {
-                let name = modal.find('#addSourceName').val();
-                let description = modal.find('#addSourceDescription').val();
-                let remote = modal.find('#addSourceRemote').val();
-                $.post(
-                    "/source",
-                    {
-                        "name": name,
-                        "description": description,
-                        "remote": remote
-                    },
-                    () => modal.removeClass('is-active')
-                ).fail(function (xhr, status, error) {
-                    alert(error);
-                    modal.removeClass('is-active');
-                });
+        });
+        modal.find('#addSourceSave').click(function () {
+            let name = modal.find('#addSourceName').val();
+            let description = modal.find('#addSourceDescription').val();
+            let remote = modal.find('#addSourceRemote').val();
+            $.post(
+                "/source",
+                {
+                    "name": name,
+                    "description": description,
+                    "remote": remote,
+                },
+                () => modal.removeClass('is-active')
+            ).fail(function (xhr, status, error) {
+                alert(error);
+                modal.removeClass('is-active');
             });
+        });
+    }
+
+    if (addActionButton.length) {
+        let modal = $('#addActionModal');
+        modal.find('#addActionCancel').click(() => modal.removeClass('is-active'));
+        modal.find('#addActionCancelIcon').click(() => modal.removeClass('is-active'));
+        addActionButton.click(function () {
+            modal.addClass('is-active');
+        });
+        modal.find('#addActionSave').click(function () {
+            let baseClass = modal.find('#addActionBaseClass').val();
+            let params = modal.find('#addActionParams').val();
+            try {
+                $.parseJSON(params);
+            } catch (exception) {
+                alert(exception.toString());
+            }
         });
     }
 });

@@ -72,7 +72,7 @@
             </tr>
             {% endfor %}
             <tr>
-                <td><button class="button">Add action</button></td>
+                <td><button id="addActionButton" class="button">Add action</button></td>
                 <td class="has-text-right"><button class="button">Save changes</button></td>
             </tr>
         </tbody>
@@ -99,5 +99,42 @@
         </div>
     </div>
     {% endfor %}
+    <div id="addActionModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Create new action</p>
+                <button id="addActionCancelIcon" class="delete" aria-label="close"></button>
+            </header>
+            <section class="modal-card-body">
+                <div class="content has-text-black">
+                    <table class="table">
+                        <tbody>
+                            <tr>
+                                <td>Base action:</td>
+                                <td>
+                                    <select id="addActionBaseClass">
+                                    {% for base_action in base_actions %}
+                                        <option>{{ base_action['base_class'] }}</option>
+                                    {% endfor %}
+                                    </select>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Parameters:</td>
+                                <td>
+                                    <textarea id="addActionParams" class="textarea" placeholder="{}"></textarea>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button id="addActionSave" class="button is-success">Save changes</button>
+                <button id="addActionCancel" class="button">Cancel</button>
+            </footer>
+        </div>
+    </div>
 </section>
 {% endblock %}
