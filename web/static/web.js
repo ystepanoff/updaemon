@@ -46,18 +46,19 @@ $(document).ready(function() {
     for (let actionModal of actionModals) {
         let modal = $('#' + actionModal.id)
         let parts = actionModal.id.split('-');
-        let action_id = parseInt(parts[1]);
-        modal.find('#cancelSaveActionIcon-' + action_id).click(() => modal.removeClass('is-active'));
-        modal.find('#cancelSaveAction-' + action_id).click(() => modal.removeClass('is-active'));
-        modal.find('#saveAction-' + action_id).click(function () {
+        let source_action_id = parseInt(parts[1]);
+        modal.find('#cancelSaveActionIcon-' + source_action_id).click(() => modal.removeClass('is-active'));
+        modal.find('#cancelSaveAction-' + source_action_id).click(() => modal.removeClass('is-active'));
+        modal.find('#saveAction-' + source_action_id).click(function () {
             try {
-                let params = modal.find('#actionParams-' + action_id).val();
+                let params = modal.find('#actionParams-' + source_action_id).val();
                 $.parseJSON(params);
                 $.post(
                     "/action",
                     {
                         "source_id": $('#sourceId').val().toString(),
-                        "action_id": action_id,
+                        "action_id": modal.find('#actionId').val(),
+                        "source_action_id": source_action_id,
                         "params": params,
                     },
                     function () {
@@ -75,10 +76,10 @@ $(document).ready(function() {
     for (let configureActionButton of configureActionButtons) {
         $('#' + configureActionButton.id).click(function () {
             let parts = configureActionButton.id.split('-');
-            let action_id = parseInt(parts[1]);
+            let source_action_id = parseInt(parts[1]);
             // TODO: params validation
-            let params_config = $.parseJSON($('#actionParamsConfig-' + action_id).val());
-            let modal = $('#actionModal-' + action_id)
+            let params_config = $.parseJSON($('#actionParamsConfig-' + source_action_id).val());
+            let modal = $('#actionModal-' + source_action_id)
             modal.addClass('is-active');
         });
     }

@@ -52,10 +52,12 @@
         <tbody>
             {% for action in actions %}
             <tr>
-                <td>{{ action.base_class }}</td>
                 <td>
-                    <input id="actionParamsConfig-{{ action.id }}" type="hidden" value="{{ action.params_config }}" />
-                    <button id="configureActionButton-{{ action.id }}" class="button is-fullwidth">Configure action</button>
+                    {{ action.base_class }}
+                </td>
+                <td>
+                    <input id="actionParamsConfig-{{ action.source_action_id }}" type="hidden" value="{{ action.params_config }}" />
+                    <button id="configureActionButton-{{ action.source_action_id }}" class="button is-fullwidth">Configure action</button>
                 </td>
                 <td class="has-text-centered"><button class="delete is-medium"></button></td>
             </tr>
@@ -70,21 +72,22 @@
 </div>
 <section id="modals">
     {% for action in actions %}
-    <div id="actionModal-{{ action.id }}" class="modal">
+    <div id="actionModal-{{ action['source_action_id'] }}" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">Edit {{ action.base_class }}</p>
-                <button id="cancelSaveActionIcon-{{ action.id }}" class="delete" aria-label="close"></button>
+                <input id="actionId" type="hidden" value="{{ action.id }}" />
+                <button id="cancelSaveActionIcon-{{ action.source_action_id }}" class="delete" aria-label="close"></button>
             </header>
             <section class="modal-card-body">
                 <div class="content has-text-black">
-                    <textarea id="actionParams-{{ action.id }}" class="textarea" placeholder="{}">{{ action.params }}</textarea>
+                    <textarea id="actionParams-{{ action.source_action_id }}" class="textarea" placeholder="{}">{{ action.params }}</textarea>
                 </div>
             </section>
             <footer class="modal-card-foot">
-                <button id="saveAction-{{ action.id }}" class="button is-success">Save changes</button>
-                <button id="cancelSaveAction-{{ action.id }}" class="button">Cancel</button>
+                <button id="saveAction-{{ action.source_action_id }}" class="button is-success">Save changes</button>
+                <button id="cancelSaveAction-{{ action.source_action_id }}" class="button">Cancel</button>
             </footer>
         </div>
     </div>

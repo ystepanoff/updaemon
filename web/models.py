@@ -107,7 +107,7 @@ class Source:
                     'source_action_id': source_action_id,
                     'params_config': params_config,
                     'params': params,
-                } for action_id, base_class, source_action_id, params_config, params in cur.fetchall()
+                } for action_id, base_class, params_config, source_action_id, params in cur.fetchall()
             ]
 
     def update(self, source_id: int) -> None:
@@ -182,7 +182,6 @@ class SourceAction:
                 return SourceAction(*cur.fetchone())
         return None
 
-
     def update(self, source_action_id: int) -> None:
         with db.get_db().cursor() as cur:
             cur.execute("""
@@ -197,7 +196,7 @@ class SourceAction:
                 'id': source_action_id,
                 'source_id': self.source_id,
                 'action_id': self.action_id,
-                'params': self.params,
+                'params': json.dumps(self.params),
             })
 
     def save(self) -> None:

@@ -70,10 +70,17 @@ def source_post() -> str:
 @login_required
 def action_post() -> str:
     source_id = int(request.form.get('source_id'))
-    action_id = int(request.form.get('action_id'))
-    params = json.loads(request.form.get('params'))
     source = Source.from_id(source_id, current_user.get_id())
-    if source:
-        source_action = SourceAction(source_id, action_id, params)
-        source_action.persist()
+    if source is not None:
+        params = json.loads(request.form.get('params'))
+        action_id = request.form.get('action_id')
+        source_action_id = request.form.get('source_action_id')
+        if source_action_id is None:
+            source_action = SourceAction(source_id, action_id, params)
+            source_action.save()
+        else:
+            source_action = SourceAction.from_id(source_action_id, current_user.get_id())
+            source_action.action_id = action_id
+            source_action.params = params
+            source_action.update(source_action_id)
     return ''

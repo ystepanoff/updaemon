@@ -1,6 +1,6 @@
 from typing import Any
 from email.message import EmailMessage
-from aiosmtplib import send
+from smtplib import SMTP
 
 from actions.base_action import BaseAction
 
@@ -21,10 +21,13 @@ class EmailAction(BaseAction):
         email['Subject'] = meta
         email.set_content(message)
 
-        await send(
-            email,
-            hostname=self.hostname,
-            port=self.port,
-            username=self.username,
-            password=self.password,
-        )
+        server = SMTP(self.hostname, self.port)
+        server.connect(self.hostname, self.port)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(self.username, self.password)
+        text = email.as_string()
+        server.sendmail(self.username, self.recipients, text)
+        server.quit()
+
