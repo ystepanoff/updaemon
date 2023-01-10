@@ -117,10 +117,22 @@ $(document).ready(function() {
             modal.addClass('is-active');
         });
         modal.find('#addActionSave').click(function () {
-            let baseClass = modal.find('#addActionBaseClass').val();
+            let baseClassId = parseInt(modal.find('#addActionBaseClass').val());
             let params = modal.find('#addActionParams').val();
             try {
                 $.parseJSON(params);
+                $.post(
+                    "/action",
+                    {
+                        "source_id": $('#sourceId').val().toString(),
+                        "action_id": baseClassId,
+                        "params": params
+                    },
+                    () => modal.removeClass('is-active')
+                ).fail(function (xhr, status, error) {
+                    alert(error);
+                    modal.removeClass('is-active');
+                });
             } catch (exception) {
                 alert(exception.toString());
             }

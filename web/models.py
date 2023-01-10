@@ -70,7 +70,7 @@ class Source:
         self.remote = remote
 
     @classmethod
-    def from_id(cls, source_id: int, user_id: int) -> Source:
+    def from_id(cls, source_id: int, user_id: int) -> Optional[Source]:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
@@ -90,7 +90,7 @@ class Source:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
-                    action.id, action.base_class, COALESCE(action.params_config, '{}'), source_action.params
+                    action.id, action.base_class, COALESCE(action.params_config, '{}'), source_action.id, source_action.params
                 FROM action
                 INNER JOIN source_action
                 ON action.id = source_action.action_id
@@ -104,9 +104,10 @@ class Source:
                 {
                     'id': action_id,
                     'base_class': base_class,
+                    'source_action_id': source_action_id,
                     'params_config': params_config,
                     'params': params,
-                } for action_id, base_class, params_config, params in cur.fetchall()
+                } for action_id, base_class, source_action_id, params_config, params in cur.fetchall()
             ]
 
     def update(self, source_id: int) -> None:
@@ -164,12 +165,46 @@ class SourceAction:
         self.action_id = int(action_id)
         self.params = params
 
-    def persist(self):
+    @classmethod
+    def from_id(cls, source_action_id: int, user_id: int) -> Optional[SourceAction]:
+        with db.get_db().cursor() as cur:
+            cur.execute("""
+                SELECT
+                    source_id, action_id, COALESCE(params, '{}')
+                FROM source_action
+                WHERE id = %(id)s
+                AND source_id in (SELECT id FROM source WHERE user_id = %(user_id)s)
+            """, {
+                'id': source_action_id,
+                'user_id': user_id,
+            })
+            if cur.rowcount > 0:
+                return SourceAction(*cur.fetchone())
+        return None
+
+
+    def update(self, source_action_id: int) -> None:
+        with db.get_db().cursor() as cur:
+            cur.execute("""
+                UPDATE source_action
+                SET
+                    source_id = %(source_id)s,
+                    action_id = %(action_id)s,
+                    params = %(params)s
+                WHERE
+                    id = %(id)s
+            """, {
+                'id': source_action_id,
+                'source_id': self.source_id,
+                'action_id': self.action_id,
+                'params': self.params,
+            })
+
+    def save(self) -> None:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 INSERT INTO source_action (source_id, action_id, params)
                 VALUES (%(source_id)s, %(action_id)s, %(params)s)
-                ON DUPLICATE KEY UPDATE source_action.params = %(params)s
             """, {
                 'source_id': self.source_id,
                 'action_id': self.action_id,

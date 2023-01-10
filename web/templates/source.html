@@ -41,39 +41,29 @@
     Edit actions
 </h1>
 <div class="box">
-    <table class="table is-fullwidth">
+    <table class="table is-fullwidth is-narrow">
         <thead>
             <tr>
                 <th>Base action</th>
                 <th>Params</th>
+                <th></th>
             </tr>
         </thead>
         <tbody>
             {% for action in actions %}
             <tr>
-                <td>
-
-                    <div class="select is-fullwidth">
-                        <select>
-                            {% for base_action in base_actions %}
-                            {% if base_action['base_class'] == action.base_class %}
-                            <option selected>{{ base_action['base_class'] }}</option>
-                            {% else %}
-                            <option>{{ base_action['base_class'] }}</option>
-                            {% endif %}
-                            {% endfor %}
-                        </select>
-                    </div>
-                </td>
+                <td>{{ action.base_class }}</td>
                 <td>
                     <input id="actionParamsConfig-{{ action.id }}" type="hidden" value="{{ action.params_config }}" />
                     <button id="configureActionButton-{{ action.id }}" class="button is-fullwidth">Configure action</button>
                 </td>
+                <td class="has-text-centered"><button class="delete is-medium"></button></td>
             </tr>
             {% endfor %}
             <tr>
                 <td><button id="addActionButton" class="button">Add action</button></td>
-                <td class="has-text-right"><button class="button">Save changes</button></td>
+                <td></td>
+                <td></td>
             </tr>
         </tbody>
     </table>
@@ -113,11 +103,13 @@
                             <tr>
                                 <td>Base action:</td>
                                 <td>
-                                    <select id="addActionBaseClass">
-                                    {% for base_action in base_actions %}
-                                        <option>{{ base_action['base_class'] }}</option>
-                                    {% endfor %}
-                                    </select>
+                                    <div class="select">
+                                        <select id="addActionBaseClass">
+                                        {% for base_action in base_actions %}
+                                            <option value="{{ base_action['id'] }}">{{ base_action['base_class'] }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
                                 </td>
                             </tr>
                             <tr>
