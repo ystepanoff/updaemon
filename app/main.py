@@ -43,15 +43,18 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
                         continue
                     if any(
                         params_config[param] != str(type(params[param]).__name__)
-                        for param in params
+                        for param in params_config
                     ):
                         logging.error('Parameter type mismatch for %s', base_class)
                         continue
                     action = getattr(actions, base_class)(**params)
-                    await action.action(
-                        meta='Updated: {}'.format(source['remote']),
-                        message='Updated: {}'.format(source['remote']),
-                    )
+                    try:
+                        await action.action(
+                            meta='Updated: {}'.format(source['remote']),
+                            message='Updated: {}'.format(source['remote']),
+                        )
+                    except Exception as exception:
+                        logging.error('Source %s action %s: %s', source_id, base_class, exception)
                 await db_handler.upsert_state(source_id, new_state)
         except AttributeError:
             traceback.print_exc()

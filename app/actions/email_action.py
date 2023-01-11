@@ -27,7 +27,6 @@ class EmailAction(BaseAction):
         server.starttls()
         server.ehlo()
         server.login(self.username, self.password)
-        text = email.as_string()
-        server.sendmail(self.username, self.recipients, text)
+        server.sendmail(self.username, self.recipients, email.as_string())
         server.quit()
 

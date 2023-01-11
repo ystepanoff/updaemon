@@ -4,7 +4,7 @@
 <h1 class="title">
     Welcome, {{ name }}!
 </h1>
-<div class="box">
+<div id="sourcesList" class="box">
     {% with messages = get_flashed_messages() %}
     {% if messages %}
         <div class="notification is-danger">
@@ -27,7 +27,7 @@
                 <td><a href="/source?id={{ source['id'] }}" class="has-text-info">{{ source['name'] }}</a></td>
                 <td>{{ source['description'] }}</td>
                 <td><a href="{{ source['remote'] }}" class="has-text-info" target="_blank">{{ source['remote'] }}</a></td>
-                <td><button class="delete is-medium"></button></td>
+                <td><button id="deleteSourceButton-{{ source['id'] }}" class="delete is-medium"></button></td>
             </tr>
             {% endfor %}
         </tbody>

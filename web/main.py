@@ -48,14 +48,19 @@ def source_get() -> str:
 @main.route('/source', methods=['POST'])
 @login_required
 def source_post() -> str:
-    source_id = request.form.get('id')
+    source_id = request.form.get('source_id')
     if source_id is not None:
-        source = Source.from_id(int(source_id), current_user.get_id())
+        source_id = int(source_id)
+        source = Source.from_id(source_id, current_user.get_id())
         if source is not None:
-            source.name = request.form.get('name')
-            source.description = str(request.form.get('description'))
-            source.remote = str(request.form.get('remote'))
-            source.update(source_id)
+            delete = request.form.get('delete', False)
+            if delete:
+                source.delete(source_id)
+            else:
+                source.name = request.form.get('name')
+                source.description = str(request.form.get('description'))
+                source.remote = str(request.form.get('remote'))
+                source.update(source_id)
     else:
         name = request.form.get('name')
         description = request.form.get('description')
@@ -73,8 +78,8 @@ def action_post() -> str:
     source = Source.from_id(source_id, current_user.get_id())
     if source is not None:
         params = json.loads(request.form.get('params'))
-        action_id = request.form.get('action_id')
-        source_action_id = request.form.get('source_action_id')
+        action_id = int(request.form.get('action_id'))
+        source_action_id = int(request.form.get('source_action_id'))
         if source_action_id is None:
             source_action = SourceAction(source_id, action_id, params)
             source_action.save()

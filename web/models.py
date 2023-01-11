@@ -128,6 +128,12 @@ class Source:
                 'remote': self.remote,
             })
 
+    def delete(self, source_id: int) -> None:
+        with db.get_db().cursor() as cur:
+            cur.execute("DELETE FROM source_scraper WHERE source_id = %s", source_id)
+            cur.execute("DELETE FROM source_action WHERE source_id = %s", source_id)
+            cur.execute("DELETE FROM source WHERE id = %s", source_id)
+
     def save(self):
         with db.get_db().cursor() as cur:
             cur.execute("""
@@ -141,6 +147,7 @@ class Source:
                 'description': self.description,
                 'remote': self.remote,
             })
+            db.get_db().commit()
 
 
 class Action:

@@ -1,8 +1,9 @@
 $(document).ready(function() {
     let saveSourceButton = $('#saveSourceButton');
+    let addSourceButton = $('#addSourceButton');
+    let deleteSourceButtons = $('[id^="deleteSourceButton-"]');
     let configureActionButtons = $('[id^="configureActionButton-"]');
     let actionModals = $('[id^="actionModal-"]');
-    let addSourceButton = $('#addSourceButton');
     let addActionButton = $('#addActionButton');
 
     if (saveSourceButton.length) {
@@ -12,7 +13,7 @@ $(document).ready(function() {
             $.post(
                 "/source",
                 {
-                    "id": $('#sourceId').val().toString(),
+                    "source_id": $('#sourceId').val().toString(),
                     "name": $('#sourceName').val().toString(),
                     "description": $('#sourceDescription').val().toString(),
                     "remote": $('#sourceRemote').val().toString()
@@ -107,6 +108,25 @@ $(document).ready(function() {
                 alert(error);
                 modal.removeClass('is-active');
             });
+        });
+    }
+
+    for (let deleteSourceButton of deleteSourceButtons) {
+        $('#' + deleteSourceButton.id).click(function () {
+            if (confirm("Do you want to delete this source?")) {
+                let parts = deleteSourceButton.id.split('-');
+                let source_id = parseInt(parts[1]);
+                $.post(
+                    "/source",
+                    {
+                        "source_id": source_id,
+                        "detele": true
+                    },
+                    () => location.reload()
+                ).fail(function (xhr, status, error) {
+                    alert(error);
+                });
+            }
         });
     }
 
