@@ -120,7 +120,7 @@ $(document).ready(function() {
                     "/source",
                     {
                         "source_id": source_id,
-                        "detele": true
+                        "delete": true
                     },
                     () => location.reload()
                 ).fail(function (xhr, status, error) {
