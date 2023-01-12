@@ -1,0 +1,2 @@
+ALTER TABLE source ADD user_id INT NOT NULL AFTER id;
+ALTER TABLE source ADD FOREIGN KEY (user_id) REFERENCES user(id);

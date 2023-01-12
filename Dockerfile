@@ -1,5 +1,7 @@
 FROM debian:stable
 
+ARG CACHEBUST=1
+
 RUN apt-get -qq -y update \
     && apt-get -qq -y install locales python3 python3-pip cron \
     && apt-get -qq -y autoremove \

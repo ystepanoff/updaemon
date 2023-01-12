@@ -1,6 +1,7 @@
 from typing import Dict, Any, Optional
 import logging
 
+
 class BaseScraper:
     def __init__(self, remote: str, params: Dict[str, Any]) -> None:
         self.remote = remote
