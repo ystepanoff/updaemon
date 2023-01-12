@@ -56,7 +56,19 @@ class DBHandler:
     async def list_sources(self) -> List[Dict[str, Any]]:
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
-                await cur.execute("SELECT id, name, description, type, remote FROM source")
+                await cur.execute("""
+                    SELECT
+                        source.id,
+                        source.name,
+                        source.description,
+                        source.type,
+                        source.remote,
+                        source.params,
+                        scraper.base_class,
+                        scraper.params_config
+                    FROM source INNER JOIN scraper
+                    ON source.scraper_id = scraper.id
+                """)
                 return [
                     {
                         'id': source_id,
@@ -64,37 +76,26 @@ class DBHandler:
                         'description': description,
                         'type': type_,
                         'remote': remote,
-                    } for (source_id, name, description, type_, remote) in await cur.fetchall()
+                        'scraper': base_class,
+                        'params': params,
+                        'params_config': params_config,
+                    } for (source_id, name, description, type_, remote, params,
+                           base_class, params_config) in await cur.fetchall()
                 ]
 
-    async def add_source(self, name: str, description: str, type_: str, remote: str) -> None:
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("""
-                    INSERT INTO source
-                        (name, description, type_, remote)
-                    VALUES
-                        (%(name)s, %(description)s, %(type)s, %(remote)s)
-                """, {
-                    'name': name,
-                    'description': description,
-                    'type': type_,
-                    'remote': remote,
-                })
-
     async def latest_state(self, source_id: int) -> Optional[Dict[str, Any]]:
+        state = {
+            'data': None,
+            'updated_at': None,
+        }
         async with self.pool.acquire() as conn:
             async with conn.cursor() as cur:
                 await cur.execute("""
                     SELECT data, updated_at FROM state WHERE source_id = %s
                 """, (source_id,))
                 if cur.rowcount > 0:
-                    data, updated_at = await cur.fetchone()
-                    return {
-                        'data': data,
-                        'updated_at': updated_at,
-                    }
-        return None
+                    state['data'], state['updated_at'] = await cur.fetchone()
+        return state
 
     async def upsert_state(self, source_id: int, state: str) -> None:
         async with self.pool.acquire() as conn:
@@ -111,25 +112,6 @@ class DBHandler:
                     'source_id': source_id,
                     'state': state,
                 })
-
-    async def find_scraper(self, source_id: int) -> Optional[Dict[str, Any]]:
-        async with self.pool.acquire() as conn:
-            async with conn.cursor() as cur:
-                await cur.execute("""
-                    SELECT scraper.base_class, source_scraper.params
-                    FROM scraper
-                    INNER JOIN source_scraper ON scraper.id = source_scraper.scraper_id
-                    WHERE source_scraper.source_id = %(source_id)s
-                """, {
-                    'source_id': source_id,
-                })
-                if cur.rowcount > 0:
-                    base_class, params = await cur.fetchone()
-                    return {
-                        'base_class': base_class,
-                        'params': json.loads(params),
-                    }
-        return None
 
     async def list_actions(self, source_id: int) -> List[Dict[str, Any]]:
         async with self.pool.acquire() as conn:

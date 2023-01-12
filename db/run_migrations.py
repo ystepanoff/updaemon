@@ -67,9 +67,9 @@ def main():
                         cursor.execute("""
                             INSERT INTO migrations (id, name) VALUES (%s, %s)
                         """, (migration_id, name))
-                        print(f'Applied migration: {file}')
+                        print(f'Applied migration: {migration_file}')
                     except pymysql.err.Error as exception:
-                        print(f'{file}: {exception}')
+                        print(f'{migration_file}: {exception}')
         connection.commit()
 
 

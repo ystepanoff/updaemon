@@ -24,43 +24,39 @@ def has_updated(new_state: str, old_state: str) -> bool:
 async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
     source_id = int(source['id'])
     old_state = await db_handler.latest_state(source_id)
-    scraper_data = await db_handler.find_scraper(source_id)
-    if scraper_data is not None:
-        try:
-            scraper = getattr(scrapers, scraper_data['base_class'])(
-                remote=source.get('remote'),
-                params=scraper_data.get('params', {})
-            )
-            new_state = await scraper.scrape()
-            if has_updated(new_state, old_state['data']):
-                actions_data = await db_handler.list_actions(source_id)
-                for action_data in actions_data:
-                    base_class = action_data.get('base_class')
-                    params_config = action_data.get('params_config', {})
-                    params = action_data.get('params', {})
-                    if any(param not in params for param in params_config):
-                        logging.error('Missing parameters for %s', base_class)
-                        continue
-                    if any(
-                        params_config[param] != str(type(params[param]).__name__)
-                        for param in params_config
-                    ):
-                        logging.error('Parameter type mismatch for %s', base_class)
-                        continue
-                    action = getattr(actions, base_class)(**params)
-                    try:
-                        await action.action(
-                            meta='Updated: {}'.format(source['remote']),
-                            message='Updated: {}'.format(source['remote']),
-                        )
-                    except Exception as exception:
-                        logging.error('Source %s action %s: %s', source_id, base_class, exception)
-                await db_handler.upsert_state(source_id, new_state)
-        except AttributeError:
-            traceback.print_exc()
-            logging.error('Wrong scraper %s for source %s.', scraper_data['base_class'], source_id)
-    else:
-        logging.error('Could not find any scrapers for source %s.', source_id)
+    try:
+        scraper = getattr(scrapers, source['scraper'])(
+            remote=source.get('remote'),
+            params=source.get('params', {})
+        )
+        new_state = await scraper.scrape()
+        if has_updated(new_state, old_state['data']):
+            actions_data = await db_handler.list_actions(source_id)
+            for action_data in actions_data:
+                base_class = action_data.get('base_class')
+                params_config = action_data.get('params_config', {})
+                params = action_data.get('params', {})
+                if any(param not in params for param in params_config):
+                    logging.error('Missing parameters for %s', base_class)
+                    continue
+                if any(
+                    params_config[param] != str(type(params[param]).__name__)
+                    for param in params_config
+                ):
+                    logging.error('Parameter type mismatch for %s', base_class)
+                    continue
+                action = getattr(actions, base_class)(**params)
+                try:
+                    await action.action(
+                        meta='Updated: {}'.format(source['remote']),
+                        message='Updated: {}'.format(source['remote']),
+                    )
+                except Exception as exception:
+                    logging.error('Source %s action %s: %s', source_id, base_class, exception)
+            await db_handler.upsert_state(source_id, new_state)
+    except AttributeError:
+        traceback.print_exc()
+        logging.error('Wrong scraper %s for source %s.', source['scraper'], source_id)
 
 
 async def main() -> None:
