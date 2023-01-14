@@ -27,6 +27,20 @@ services:
       - /tmp
     volumes:
       - ./:/opt/updaemon
-      
+
+  web:
+    build:
+      context: ./
+      dockerfile: ./web/Dockerfile
+    ports:
+      - "127.0.0.1:5000:5000"
+    volumes:
+      - ./web:/opt/web
+    environment:
+      - UPDAEMON_CONFIG_FILE=/opt/updaemon.conf
+      - FLASK_APP=.
+      - FLASK_DEBUG=1
+
 volumes:
   updaemon-data: {}
+

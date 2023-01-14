@@ -1,10 +1,13 @@
 from typing import Any
 from email.message import EmailMessage
-from aiosmtplib import send
+from smtplib import SMTP
+
+from actions.base_action import BaseAction
 
 
-class EmailAction:
+class EmailAction(BaseAction):
     def __init__(self, **kwargs: Any) -> None:
+        super().__init__(**kwargs)
         self.recipients = kwargs.get('recipients', [])
         self.hostname = kwargs.get('hostname', 'localhost')
         self.port = kwargs.get('port', 25)
@@ -18,10 +21,12 @@ class EmailAction:
         email['Subject'] = meta
         email.set_content(message)
 
-        await send(
-            email,
-            hostname=self.hostname,
-            port=self.port,
-            username=self.username,
-            password=self.password,
-        )
+        server = SMTP(self.hostname, self.port)
+        server.connect(self.hostname, self.port)
+        server.ehlo()
+        server.starttls()
+        server.ehlo()
+        server.login(self.username, self.password)
+        server.sendmail(self.username, self.recipients, email.as_string())
+        server.quit()
+
