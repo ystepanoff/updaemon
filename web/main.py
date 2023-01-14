@@ -96,6 +96,8 @@ def action_post() -> str:
             if delete:
                 source_action.delete(source_action_id)
             else:
+                action_id = int(request.form.get('action_id'))
+                params = json.loads(request.form.get('params'))
                 source_action.action_id = action_id
                 source_action.params = params
                 source_action.update(source_action_id)
