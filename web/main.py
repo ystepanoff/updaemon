@@ -77,15 +77,20 @@ def action_post() -> str:
     source_id = int(request.form.get('source_id'))
     source = Source.from_id(source_id, current_user.get_id())
     if source is not None:
-        params = json.loads(request.form.get('params'))
-        action_id = int(request.form.get('action_id'))
-        source_action_id = int(request.form.get('source_action_id'))
+        source_action_id = request.form.get('source_action_id')
         if source_action_id is None:
+            params = json.loads(request.form.get('params'))
+            action_id = int(request.form.get('action_id'))
             source_action = SourceAction(source_id, action_id, params)
             source_action.save()
         else:
+            source_action_id = int(source_action_id)
             source_action = SourceAction.from_id(source_action_id, current_user.get_id())
-            source_action.action_id = action_id
-            source_action.params = params
-            source_action.update(source_action_id)
+            delete = request.form.get('delete', False)
+            if delete:
+                source_action.delete(source_action_id)
+            else:
+                source_action.action_id = action_id
+                source_action.params = params
+                source_action.update(source_action_id)
     return ''

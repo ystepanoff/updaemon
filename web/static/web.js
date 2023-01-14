@@ -2,6 +2,7 @@ $(document).ready(function() {
     let saveSourceButton = $('#saveSourceButton');
     let addSourceButton = $('#addSourceButton');
     let deleteSourceButtons = $('[id^="deleteSourceButton-"]');
+    let deleteActionButtons = $('[id^="deleteActionButton-"]');
     let configureActionButtons = $('[id^="configureActionButton-"]');
     let actionModals = $('[id^="actionModal-"]');
     let addActionButton = $('#addActionButton');
@@ -65,7 +66,7 @@ $(document).ready(function() {
                     function () {
                         modal.removeClass('is-active');
                     }
-                ).fail(function (xhr, status, error) {
+                ).done(() => location.reload()).fail(function (xhr, status, error) {
                     alert(error);
                 });
             } catch (exception) {
@@ -104,7 +105,7 @@ $(document).ready(function() {
                     "remote": remote,
                 },
                 () => modal.removeClass('is-active')
-            ).fail(function (xhr, status, error) {
+            ).done(() => location.reload()).fail(function (xhr, status, error) {
                 alert(error);
                 modal.removeClass('is-active');
             });
@@ -120,6 +121,26 @@ $(document).ready(function() {
                     "/source",
                     {
                         "source_id": source_id,
+                        "delete": true
+                    },
+                    () => location.reload()
+                ).fail(function (xhr, status, error) {
+                    alert(error);
+                });
+            }
+        });
+    }
+
+    for (let deleteActionButton of deleteActionButtons) {
+        $('#' + deleteActionButton.id).click(function () {
+            if (confirm("Do you want to delete this action?")) {
+                let parts = deleteActionButton.id.split('-');
+                let source_action_id = parseInt(parts[1]);
+                $.post(
+                    "/action",
+                    {
+                        "source_id": $('#sourceId').val().toString(),
+                        "source_action_id": source_action_id,
                         "delete": true
                     },
                     () => location.reload()
@@ -150,7 +171,7 @@ $(document).ready(function() {
                         "params": params
                     },
                     () => modal.removeClass('is-active')
-                ).fail(function (xhr, status, error) {
+                ).done(() => location.reload()).fail(function (xhr, status, error) {
                     alert(error);
                     modal.removeClass('is-active');
                 });

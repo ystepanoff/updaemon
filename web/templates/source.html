@@ -59,7 +59,7 @@
                     <input id="actionParamsConfig-{{ action.source_action_id }}" type="hidden" value="{{ action.params_config }}" />
                     <button id="configureActionButton-{{ action.source_action_id }}" class="button is-fullwidth">Configure action</button>
                 </td>
-                <td class="has-text-centered"><button class="delete is-medium"></button></td>
+                <td class="has-text-centered"><button id="deleteActionButton-{{ action.source_action_id }}" class="delete is-medium"></button></td>
             </tr>
             {% endfor %}
             <tr>
@@ -72,7 +72,7 @@
 </div>
 <section id="modals">
     {% for action in actions %}
-    <div id="actionModal-{{ action['source_action_id'] }}" class="modal">
+    <div id="actionModal-{{ action.source_action_id }}" class="modal">
         <div class="modal-background"></div>
         <div class="modal-card">
             <header class="modal-card-head">
@@ -109,7 +109,7 @@
                                     <div class="select">
                                         <select id="addActionBaseClass">
                                         {% for base_action in base_actions %}
-                                            <option value="{{ base_action['id'] }}">{{ base_action['base_class'] }}</option>
+                                            <option value="{{ base_action.id }}">{{ base_action.base_class }}</option>
                                         {% endfor %}
                                         </select>
                                     </div>

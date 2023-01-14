@@ -130,7 +130,6 @@ class Source:
 
     def delete(self, source_id: int) -> None:
         with db.get_db().cursor() as cur:
-            cur.execute("DELETE FROM source_scraper WHERE source_id = %s", source_id)
             cur.execute("DELETE FROM source_action WHERE source_id = %s", source_id)
             cur.execute("DELETE FROM source WHERE id = %s", source_id)
 
@@ -216,3 +215,8 @@ class SourceAction:
                 'action_id': self.action_id,
                 'params': json.dumps(self.params),
             })
+
+    def delete(self, source_action_id: int) -> None:
+        with db.get_db().cursor() as cur:
+            cur.execute("DELETE FROM source_action WHERE id = %s", source_action_id)
+

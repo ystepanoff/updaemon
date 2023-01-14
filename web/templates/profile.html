@@ -24,10 +24,10 @@
         <tbody>
             {% for source in sources %}
             <tr>
-                <td><a href="/source?id={{ source['id'] }}" class="has-text-info">{{ source['name'] }}</a></td>
-                <td>{{ source['description'] }}</td>
-                <td><a href="{{ source['remote'] }}" class="has-text-info" target="_blank">{{ source['remote'] }}</a></td>
-                <td><button id="deleteSourceButton-{{ source['id'] }}" class="delete is-medium"></button></td>
+                <td><a href="/source?id={{ source.id }}" class="has-text-info">{{ source.name }}</a></td>
+                <td>{{ source.description }}</td>
+                <td><a href="{{ source.remote }}" class="has-text-info" target="_blank">{{ source.remote }}</a></td>
+                <td><button id="deleteSourceButton-{{ source.id }}" class="delete is-medium"></button></td>
             </tr>
             {% endfor %}
         </tbody>
