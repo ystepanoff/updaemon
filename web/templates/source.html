@@ -28,6 +28,31 @@
             </tr>
 
             <tr>
+                <td>Scraper:</td>
+                <td>
+                    <div class="select is-fullwidth">
+                        <select id="sourceScraperId">
+                            {% for base_scraper in base_scrapers %}
+                            {% if base_scraper.id == source.scraper_id %}
+                            <option value="{{ base_scraper.id }}" selected>{{ base_scraper.base_class }}</option>
+                            {% else %}
+                            <option value="{{ base_scraper.id }}">{{ base_scraper.base_class }}</option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                </td>
+                <td></td>
+            </tr>
+
+            <tr>
+                <td>Scraper params:</td>
+                <td colspan="2">
+                    <textarea id="sourceParams" class="textarea" name="params">{{ source.params }}</textarea>
+                </td>
+            </tr>
+
+            <tr>
                 <td></td>
                 <td></td>
                 <td class="has-text-right">

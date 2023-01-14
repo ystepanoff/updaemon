@@ -2,7 +2,7 @@ import json
 from flask import Blueprint, render_template, request, flash
 from flask_login import login_required, current_user
 
-from .models import Source, Action, SourceAction
+from .models import Source, Scraper, Action, SourceAction
 
 
 main = Blueprint('main', __name__)
@@ -34,6 +34,7 @@ def source_get() -> str:
             'source.html',
             source_id=source_id,
             source=source,
+            base_scrapers=Scraper.list_base_scrapers(),
             actions=Source.list_actions(source_id, user_id),
             base_actions=Action.list_base_actions(),
         )
@@ -60,12 +61,16 @@ def source_post() -> str:
                 source.name = request.form.get('name')
                 source.description = str(request.form.get('description'))
                 source.remote = str(request.form.get('remote'))
+                source.scraper_id = int(request.form.get('scraper_id'))
+                source.params = json.loads(request.form.get('params', '{}'))
                 source.update(source_id)
     else:
         name = request.form.get('name')
         description = request.form.get('description')
         remote = request.form.get('remote')
-        source = Source(current_user.get_id(), name, description, remote)
+        scraper_id = request.form.get('scraper_id')
+        params = json.loads(request.form.get('params'))
+        source = Source(current_user.get_id(), name, description, remote, scraper_id, params)
         source.save()
     return ''
 

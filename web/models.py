@@ -63,18 +63,28 @@ class User(UserMixin):
 
 
 class Source:
-    def __init__(self, user_id: int, name: str = None, description: str = None, remote: str = None) -> None:
+    def __init__(
+            self,
+            user_id: int,
+            name: str = None,
+            description: str = None,
+            remote: str = None,
+            scraper_id: int = None,
+            params: str = None,
+    ) -> None:
         self.user_id = user_id
         self.name = name
         self.description = description
         self.remote = remote
+        self.scraper_id = scraper_id
+        self.params = params
 
     @classmethod
     def from_id(cls, source_id: int, user_id: int) -> Optional[Source]:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
-                    user_id, name, description, remote
+                    user_id, name, description, remote, scraper_id, COALESCE(params, '{}')
                 FROM source
                 WHERE id = %(id)s AND user_id = %(user_id)s
             """, {
@@ -118,7 +128,9 @@ class Source:
                     user_id = %(user_id)s,
                     name = %(name)s,
                     description = %(description)s,
-                    remote = %(remote)s
+                    remote = %(remote)s,
+                    scraper_id = %(scraper_id)s,
+                    params = %(params)s
                 WHERE id = %(source_id)s
             """, {
                 'source_id': source_id,
@@ -126,6 +138,8 @@ class Source:
                 'name': self.name,
                 'description': self.description,
                 'remote': self.remote,
+                'scraper_id': self.scraper_id,
+                'params': json.dumps(self.params),
             })
 
     def delete(self, source_id: int) -> None:
@@ -137,14 +151,16 @@ class Source:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 INSERT INTO source
-                    (user_id, name, description, remote)
+                    (user_id, name, description, remote, scraper_id, params)
                 VALUES
-                    (%(user_id)s, %(name)s, %(description)s, %(remote)s)
+                    (%(user_id)s, %(name)s, %(description)s, %(remote)s, %(scraper_id)s, %(params)s)
             """, {
                 'user_id': self.user_id,
                 'name': self.name,
                 'description': self.description,
                 'remote': self.remote,
+                'scraper_id': self.scraper_id,
+                'params': json.dumps(self.params),
             })
             db.get_db().commit()
 
@@ -220,3 +236,20 @@ class SourceAction:
         with db.get_db().cursor() as cur:
             cur.execute("DELETE FROM source_action WHERE id = %s", source_action_id)
 
+
+class Scraper:
+    def __init__(self, base_class: str, params_config: str = None):
+        self.base_class = base_class
+        self.params_config = params_config
+
+    @classmethod
+    def list_base_scrapers(cls):
+        with db.get_db().cursor() as cur:
+            cur.execute("SELECT id, base_class, params_config FROM scraper")
+            return [
+                {
+                    'id': scraper_id,
+                    'base_class': base_class,
+                    'params_config': params_config,
+                } for scraper_id, base_class, params_config in cur.fetchall()
+            ]
