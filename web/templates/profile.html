@@ -65,6 +65,24 @@
                                 <td>Remote:</td>
                                 <td><input id="addSourceRemote" type="text" class="input" name="remote" /></td>
                             </tr>
+                            <tr>
+                                <td>Scraper:</td>
+                                <td>
+                                    <div class="select is-fullwidth">
+                                        <select id="addSourceScraperId">
+                                        {% for base_scraper in base_scrapers %}
+                                        <option value="{{ base_scraper.id }}">{{ base_scraper.base_class }}</option>
+                                        {% endfor %}
+                                        </select>
+                                    </div>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>Scraper params:</td>
+                                <td>
+                                    <textarea id="addSourceParams" class="textarea" placeholder="{}"></textarea>
+                                </td>
+                            </tr>
                         </tbody>
                     </table>
                 </div>

@@ -105,18 +105,27 @@ $(document).ready(function() {
             let name = modal.find('#addSourceName').val();
             let description = modal.find('#addSourceDescription').val();
             let remote = modal.find('#addSourceRemote').val();
-            $.post(
-                "/source",
-                {
-                    "name": name,
-                    "description": description,
-                    "remote": remote,
-                },
-                () => modal.removeClass('is-active')
-            ).done(() => location.reload()).fail(function (xhr, status, error) {
-                alert(error);
-                modal.removeClass('is-active');
-            });
+            let scraper_id = modal.find('#addSourceScraperId').val();
+            let params = modal.find('#addSourceParams').val();
+            try {
+                $.parseJSON(params);
+                $.post(
+                    "/source",
+                    {
+                        "name": name,
+                        "description": description,
+                        "remote": remote,
+                        "scraper_id": scraper_id,
+                        "params": params
+                    },
+                    () => modal.removeClass('is-active')
+                ).done(() => location.reload()).fail(function (xhr, status, error) {
+                    alert(error);
+                    modal.removeClass('is-active');
+                });
+            } catch (exception) {
+                alert(exception.toString());
+            }
         });
     }
 

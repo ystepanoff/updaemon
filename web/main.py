@@ -20,6 +20,7 @@ def profile() -> str:
         'profile.html',
         name=current_user.name,
         sources=current_user.list_sources(),
+        base_scrapers=Scraper.list_base_scrapers(),
     )
 
 
