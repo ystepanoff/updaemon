@@ -173,12 +173,14 @@ class Action:
     @classmethod
     def list_base_actions(cls):
         with db.get_db().cursor() as cur:
-            cur.execute("SELECT id, base_class FROM action")
+            cur.execute("SELECT id, base_class, COALESCE(params_config, '{}'), COALESCE(params_order, '{}') FROM action")
             return [
                 {
                     'id': action_id,
                     'base_class': base_class,
-                } for action_id, base_class in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                } for action_id, base_class, params_config, params_order in cur.fetchall()
             ]
 
 

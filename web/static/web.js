@@ -196,5 +196,14 @@ $(document).ready(function() {
                 alert(exception.toString());
             }
         });
+        modal.find('#addActionBaseClass').change(function () {
+            for (let paramsTable of modal.find('[id^="addActionParamsTable-"]')) {
+                if (!$('#' + paramsTable.id).hasClass('is-hidden')) {
+                    $('#' + paramsTable.id).addClass('is-hidden');
+                }
+            }
+            let baseClassId = parseInt(modal.find('#addActionBaseClass').val());
+            modal.find('#addActionParamsTable-' + baseClassId).removeClass('is-hidden');
+        });
     }
 });

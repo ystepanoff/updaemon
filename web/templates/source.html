@@ -127,7 +127,7 @@
             <section class="modal-card-body">
                 <div class="content has-text-black">
                     <table class="table">
-                        <tbody>
+                        <thead>
                             <tr>
                                 <td>Base action:</td>
                                 <td>
@@ -140,13 +140,17 @@
                                     </div>
                                 </td>
                             </tr>
+                        </thead>
+                        {% for base_action in base_actions %}
+                        <tbody id="addActionParamsTable-{{ base_action.id }}" class="is-hidden">
+                            {% for param in base_action.params_order %}
                             <tr>
-                                <td>Parameters:</td>
-                                <td>
-                                    <textarea id="addActionParams" class="textarea" placeholder="{}"></textarea>
-                                </td>
+                                <td>{{ param }}:</td>
+                                <td><input id="addActionParam-{{ param }}" class="input" /></td>
                             </tr>
+                            {% endfor %}
                         </tbody>
+                        {% endfor %}
                     </table>
                 </div>
             </section>
