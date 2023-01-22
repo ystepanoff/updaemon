@@ -177,24 +177,24 @@ $(document).ready(function() {
         });
         modal.find('#addActionSave').click(function () {
             let baseClassId = parseInt(modal.find('#addActionBaseClass').val());
-            let params = modal.find('#addActionParams').val();
-            try {
-                $.parseJSON(params);
-                $.post(
-                    "/action",
-                    {
-                        "source_id": $('#sourceId').val().toString(),
-                        "action_id": baseClassId,
-                        "params": params
-                    },
-                    () => modal.removeClass('is-active')
-                ).done(() => location.reload()).fail(function (xhr, status, error) {
-                    alert(error);
-                    modal.removeClass('is-active');
-                });
-            } catch (exception) {
-                alert(exception.toString());
+            let paramsTable = modal.find('#addActionParamsTable-' + baseClassId);
+            let params = {};
+            for (let inputField of paramsTable.find(':input')) {
+                params[inputField.name] = inputField.value
             }
+            console.log(params);
+            $.post(
+                "/action",
+                {
+                    "source_id": $('#sourceId').val().toString(),
+                    "action_id": baseClassId,
+                    "params": params
+                },
+                () => modal.removeClass('is-active')
+            ).done(() => location.reload()).fail(function (xhr, status, error) {
+                alert(error);
+                modal.removeClass('is-active');
+            });
         });
         modal.find('#addActionBaseClass').change(function () {
             for (let paramsTable of modal.find('[id^="addActionParamsTable-"]')) {

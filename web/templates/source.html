@@ -146,7 +146,13 @@
                             {% for param in base_action.params_order %}
                             <tr>
                                 <td>{{ param }}:</td>
-                                <td><input id="addActionParam-{{ param }}" class="input" /></td>
+                                <td>
+                                    {% if param in ['password', 'secret'] %}
+                                    <input id="addActionParam-{{ param }}" class="input" type="password" name="{{ param }}"/>
+                                    {% else %}
+                                    <input id="addActionParam-{{ param }}" class="input" type="text" name="{{ param }}"/>
+                                    {% endif %}
+                                </td>
                             </tr>
                             {% endfor %}
                         </tbody>
