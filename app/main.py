@@ -5,6 +5,7 @@ import asyncio
 import logging
 import traceback
 import sys
+from difflib import unified_diff
 from hashlib import sha512
 from zc.lockfile import LockFile, LockError
 
@@ -31,6 +32,11 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
         )
         new_state = await scraper.scrape()
         if has_updated(new_state, old_state['data']):
+            diff = unified_diff(
+                new_state.splitlines(keepends=True),
+                old_state['data'].splitlines(keepends=True)
+            )
+            message = 'Updated: {}\n\n{}'.format(source['remote'], diff)
             actions_data = await db_handler.list_actions(source_id)
             for action_data in actions_data:
                 base_class = action_data.get('base_class')
@@ -49,7 +55,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
                 try:
                     await action.action(
                         meta='Updated: {}'.format(source['remote']),
-                        message='Updated: {}'.format(source['remote']),
+                        message=message,
                     )
                 except Exception as exception:
                     logging.error('Source %s action %s: %s', source_id, base_class, exception)
