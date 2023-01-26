@@ -31,7 +31,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
             params=source.get('params', {})
         )
         new_state = await scraper.scrape()
-        if has_updated(new_state, old_state['data']):
+        if has_updated(old_state['data'], new_state):
             diff = unified_diff(
                 new_state.splitlines(keepends=True),
                 old_state['data'].splitlines(keepends=True)
