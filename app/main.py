@@ -36,7 +36,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
                 new_state.splitlines(keepends=True),
                 old_state['data'].splitlines(keepends=True)
             )
-            message = 'Updated: {}\n\n{}'.format(source['remote'], diff)
+            message = 'Updated: {}\n\n{}'.format(source['remote'], ''.join(diff))
             actions_data = await db_handler.list_actions(source_id)
             for action_data in actions_data:
                 base_class = action_data.get('base_class')
