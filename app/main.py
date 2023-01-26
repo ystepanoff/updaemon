@@ -31,10 +31,10 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
             params=source.get('params', {})
         )
         new_state = await scraper.scrape()
-        if has_updated(old_state['data'], new_state):
+        if has_updated(new_state, old_state['data']):
             diff = unified_diff(
+                old_state['data'].splitlines(keepends=True),
                 new_state.splitlines(keepends=True),
-                old_state['data'].splitlines(keepends=True)
             )
             message = 'Updated: {}\n\n{}'.format(source['remote'], ''.join(diff))
             actions_data = await db_handler.list_actions(source_id)
