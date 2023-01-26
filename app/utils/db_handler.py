@@ -77,8 +77,8 @@ class DBHandler:
                         'type': type_,
                         'remote': remote,
                         'scraper': base_class,
-                        'params': params,
-                        'params_config': params_config,
+                        'params': json.loads(params),
+                        'params_config': json.loads(params_config),
                     } for (source_id, name, description, type_, remote, params,
                            base_class, params_config) in await cur.fetchall()
                 ]
