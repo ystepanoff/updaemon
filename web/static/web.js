@@ -88,7 +88,7 @@ $(document).ready(function() {
             let parts = configureActionButton.id.split('-');
             let source_action_id = parseInt(parts[1]);
             // TODO: params validation
-            let params_config = $.parseJSON($('#actionParamsConfig-' + source_action_id).val());
+            let params_config = $('#actionParamsConfig-' + source_action_id).val();
             let modal = $('#actionModal-' + source_action_id)
             modal.addClass('is-active');
         });
@@ -188,7 +188,7 @@ $(document).ready(function() {
                 {
                     "source_id": $('#sourceId').val().toString(),
                     "action_id": baseClassId,
-                    "params": params
+                    "params": JSON.stringify(params)
                 },
                 () => modal.removeClass('is-active')
             ).done(() => location.reload()).fail(function (xhr, status, error) {

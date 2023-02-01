@@ -100,7 +100,12 @@ class Source:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
-                    action.id, action.base_class, COALESCE(action.params_config, '{}'), source_action.id, source_action.params
+                    action.id,
+                    action.base_class,
+                    COALESCE(action.params_config, '{}'),
+                    COALESCE(action.params_order, '{}'),
+                    source_action.id,
+                    source_action.params
                 FROM action
                 INNER JOIN source_action
                 ON action.id = source_action.action_id
@@ -115,9 +120,10 @@ class Source:
                     'id': action_id,
                     'base_class': base_class,
                     'source_action_id': source_action_id,
-                    'params_config': params_config,
-                    'params': params,
-                } for action_id, base_class, params_config, source_action_id, params in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                    'params': json.loads(params),
+                } for action_id, base_class, params_config, params_order, source_action_id, params in cur.fetchall()
             ]
 
     def update(self, source_id: int) -> None:

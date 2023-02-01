@@ -107,7 +107,22 @@
             </header>
             <section class="modal-card-body">
                 <div class="content has-text-black">
-                    <textarea id="actionParams-{{ action.source_action_id }}" class="textarea" placeholder="{}">{{ action.params }}</textarea>
+                    <table class="table">
+                        <tbody>
+                            {% for param in action.params_order %}
+                            <tr>
+                                <td>{{ param }}:</td>
+                                <td>
+                                    {% if param in ['password', 'secret'] %}
+                                    <input id="actionParam-{{ param }}" class="input" type="password" name="{{ param }}" value="{{ action.params[param] }}" />
+                                    {% else %}
+                                    <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ action.params[param] }}"/>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </section>
             <footer class="modal-card-foot">
