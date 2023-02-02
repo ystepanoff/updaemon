@@ -98,6 +98,9 @@ def action_post() -> str:
             else:
                 action_id = int(request.form.get('action_id'))
                 params = json.loads(request.form.get('params'))
+                for param in ['password', 'secret']:
+                    if param in params and params[param] == '':
+                        params[param] = source_action.params[param]
                 source_action.action_id = action_id
                 source_action.params = params
                 source_action.update(source_action_id)

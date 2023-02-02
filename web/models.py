@@ -210,7 +210,8 @@ class SourceAction:
                 'user_id': user_id,
             })
             if cur.rowcount > 0:
-                return SourceAction(*cur.fetchone())
+                source_id, action_id, params = cur.fetchone()
+                return SourceAction(source_id, action_id, json.loads(params))
         return None
 
     def update(self, source_action_id: int) -> None:

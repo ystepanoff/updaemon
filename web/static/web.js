@@ -60,26 +60,25 @@ $(document).ready(function() {
         modal.find('#cancelSaveActionIcon-' + source_action_id).click(() => modal.removeClass('is-active'));
         modal.find('#cancelSaveAction-' + source_action_id).click(() => modal.removeClass('is-active'));
         modal.find('#saveAction-' + source_action_id).click(function () {
-            try {
-                let params = modal.find('#actionParams-' + source_action_id).val();
-                $.parseJSON(params);
-                $.post(
-                    "/action",
-                    {
-                        "source_id": $('#sourceId').val().toString(),
-                        "action_id": modal.find('#actionId').val(),
-                        "source_action_id": source_action_id,
-                        "params": params,
-                    },
-                    function () {
-                        modal.removeClass('is-active');
-                    }
-                ).done(() => location.reload()).fail(function (xhr, status, error) {
-                    alert(error);
-                });
-            } catch (exception) {
-                alert(exception.toString());
+            let paramsTable = modal.find('#actionParamsTable-' + source_action_id);
+            let params = {};
+            for (let inputField of paramsTable.find(':input')) {
+                params[inputField.name] = inputField.value
             }
+            $.post(
+                "/action",
+                {
+                    "source_id": $('#sourceId').val().toString(),
+                    "action_id": modal.find('#actionId').val(),
+                    "source_action_id": source_action_id,
+                    "params": JSON.stringify(params),
+                },
+                function () {
+                    modal.removeClass('is-active');
+                }
+            ).done(() => location.reload()).fail(function (xhr, status, error) {
+                alert(error);
+            });
         });
     }
 
@@ -182,7 +181,6 @@ $(document).ready(function() {
             for (let inputField of paramsTable.find(':input')) {
                 params[inputField.name] = inputField.value
             }
-            console.log(params);
             $.post(
                 "/action",
                 {

@@ -107,14 +107,14 @@
             </header>
             <section class="modal-card-body">
                 <div class="content has-text-black">
-                    <table class="table">
+                    <table id="actionParamsTable-{{ action.source_action_id }}" class="table">
                         <tbody>
                             {% for param in action.params_order %}
                             <tr>
                                 <td>{{ param }}:</td>
                                 <td>
                                     {% if param in ['password', 'secret'] %}
-                                    <input id="actionParam-{{ param }}" class="input" type="password" name="{{ param }}" value="{{ action.params[param] }}" />
+                                    <input id="actionParam-{{ param }}" class="input" type="password" name="{{ param }}" placeholder="leave blank to use existing" />
                                     {% else %}
                                     <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ action.params[param] }}"/>
                                     {% endif %}
