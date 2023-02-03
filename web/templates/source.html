@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1 class="title">
+<h1 class="title" xmlns="http://www.w3.org/1999/html">
     {{ source.name }}
 </h1>
 <input id="sourceId" type="hidden" value="{{ source_id }}" />
@@ -20,6 +20,7 @@
                 <th>Remote</th>
             </tr>
         </thead>
+
         <tbody>
             <tr>
                 <td><input id="sourceName" class="input" type="text" name="name" value="{{ source.name }}" /></td>
@@ -44,14 +45,23 @@
                 </td>
                 <td></td>
             </tr>
+        </tbody>
 
+        {% for base_scraper in base_scrapers %}
+        <tbody id="scraperParams-{{ base_scraper.id }}" {% if base_scraper.id != source.scraper_id %}class="is-hidden"{% endif %}>
+            {% for param in base_scraper.params_order %}
             <tr>
-                <td>Scraper params:</td>
-                <td colspan="2">
-                    <textarea id="sourceParams" class="textarea" name="params">{{ source.params }}</textarea>
+                <td></td>
+                <td>{{ param }}:</td>
+                <td>
+                    <input id="scraperParam-{{ param }}" class="input" type="text" name="{{ param }}"/>
                 </td>
             </tr>
+            {% endfor %}
+        </tbody>
+        {% endfor %}
 
+        <tfoot>
             <tr>
                 <td></td>
                 <td></td>
@@ -59,7 +69,7 @@
                     <button id="saveSourceButton" class="button">Save source</button>
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
     </table>
 </div>
 <h1 class="title">

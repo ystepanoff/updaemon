@@ -255,11 +255,12 @@ class Scraper:
     @classmethod
     def list_base_scrapers(cls):
         with db.get_db().cursor() as cur:
-            cur.execute("SELECT id, base_class, params_config FROM scraper")
+            cur.execute("SELECT id, base_class, params_config, params_order FROM scraper")
             return [
                 {
                     'id': scraper_id,
                     'base_class': base_class,
-                    'params_config': params_config,
-                } for scraper_id, base_class, params_config in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                } for scraper_id, base_class, params_config, params_order in cur.fetchall()
             ]

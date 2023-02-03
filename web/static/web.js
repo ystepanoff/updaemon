@@ -51,6 +51,9 @@ $(document).ready(function() {
                 alert(exception.toString());
             }
         });
+        $('#sourceScraperId').change(function () {
+            for
+        });
     }
 
     for (let actionModal of actionModals) {
@@ -77,7 +80,6 @@ $(document).ready(function() {
                     modal.removeClass('is-active');
                 }
             ).done(() => location.reload()).fail(function (xhr, status, error) {
-                alert(error);
             });
         });
     }
