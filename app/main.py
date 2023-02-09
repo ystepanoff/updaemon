@@ -21,7 +21,7 @@ def has_updated(new_state: str, old_state: str) -> bool:
     return new_hash != old_hash
 
 
-async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
+async def process_source(db_handler: DBHandler, source: Dict[str, Any], config: configparser.ConfigParser) -> None:
     source_id = int(source['id'])
     old_state = await db_handler.latest_state(source_id)
     try:
@@ -36,6 +36,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any]) -> None:
                 base_class = action_data.get('base_class')
                 params_config = action_data.get('params_config', {})
                 params = action_data.get('params', {})
+                params['config'] = config
                 if any(param not in params for param in params_config):
                     logging.error('Missing parameters for %s', base_class)
                     continue
@@ -90,7 +91,7 @@ async def main() -> None:
     sources = await db_handler.list_sources()
     tasks = [
         asyncio.create_task(
-            process_source(db_handler, source)
+            process_source(db_handler, source, config)
         ) for source in sources
     ]
     await asyncio.gather(*tasks)

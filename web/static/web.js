@@ -10,60 +10,67 @@ $(document).ready(function() {
     if (saveSourceButton.length) {
         let saveSourceFailed = $('#saveSourceFailed');
         let saveSourceSuccess = $('#saveSourceSuccess');
+        let sourceScraperId = $('#sourceScraperId').val();
         saveSourceButton.click(function () {
-            let params = $('#sourceParams').val().toString();
-            try {
-                $.parseJSON(params);
-                $.post(
-                    "/source",
-                    {
-                        "source_id": $('#sourceId').val().toString(),
-                        "name": $('#sourceName').val().toString(),
-                        "description": $('#sourceDescription').val().toString(),
-                        "remote": $('#sourceRemote').val().toString(),
-                        "scraper_id": $('#sourceScraperId').val().toString(),
-                        "params": params
-                    },
-                    function () {
-                        saveSourceSuccess.removeClass('is-hidden');
-                        saveSourceSuccess.stop();
-                        saveSourceSuccess.fadeTo(0, 1.0);
-                        saveSourceSuccess.fadeOut(
-                            5000,
-                            function () {
-                                saveSourceSuccess.addClass('is-hidden').fadeTo(0, 1.0);
-                            }
-                        );
-                        saveSourceFailed.addClass('is-hidden').fadeTo(0, 1.0);
-                    }
-                ).fail(function (xhr, status, error) {
-                    saveSourceFailed.removeClass('is-hidden');
-                    saveSourceFailed.stop();
-                    saveSourceFailed.fadeTo(0, 1.0);
-                    saveSourceFailed.fadeOut(
+        let params = {};
+        for (let inputField of $('#scraperParams-' + sourceScraperId).find(':input')) {
+            params[inputField.name] = inputField.value;
+        }
+            $.post(
+                "/source",
+                {
+                    "source_id": $('#sourceId').val(),
+                    "name": $('#sourceName').val(),
+                    "description": $('#sourceDescription').val(),
+                    "remote": $('#sourceRemote').val(),
+                    "scraper_id": $('#sourceScraperId').val(),
+                    "params": JSON.stringify(params)
+                },
+                function () {
+                    saveSourceSuccess.removeClass('is-hidden');
+                    saveSourceSuccess.stop();
+                    saveSourceSuccess.fadeTo(0, 1.0);
+                    saveSourceSuccess.fadeOut(
                         5000,
                         function () {
-                            saveSourceFailed.addClass('is-hidden').fadeTo(0, 1.0);
+                            saveSourceSuccess.addClass('is-hidden').fadeTo(0, 1.0);
                         }
-                    )
-                });
-            } catch (exception) {
-                alert(exception.toString());
-            }
+                    );
+                    saveSourceFailed.addClass('is-hidden').fadeTo(0, 1.0);
+                }
+            ).fail(function (xhr, status, error) {
+                saveSourceFailed.removeClass('is-hidden');
+                saveSourceFailed.stop();
+                saveSourceFailed.fadeTo(0, 1.0);
+                saveSourceFailed.fadeOut(
+                    5000,
+                    function () {
+                        saveSourceFailed.addClass('is-hidden').fadeTo(0, 1.0);
+                    }
+                )
+            });
         });
         $('#sourceScraperId').change(function () {
-            for
+            for (let scraperParams of $('[id^="scraperParams-"]')) {
+                let parts = scraperParams.id.split('-');
+                let sourceScraperId = parseInt(parts[1]);
+                if (sourceScraperId === parseInt($('#sourceScraperId').val())) {
+                    $('#' + scraperParams.id).removeClass('is-hidden');
+                } else {
+                    $('#' + scraperParams.id).addClass('is-hidden');
+                }
+            }
         });
     }
 
     for (let actionModal of actionModals) {
         let modal = $('#' + actionModal.id)
         let parts = actionModal.id.split('-');
-        let source_action_id = parseInt(parts[1]);
-        modal.find('#cancelSaveActionIcon-' + source_action_id).click(() => modal.removeClass('is-active'));
-        modal.find('#cancelSaveAction-' + source_action_id).click(() => modal.removeClass('is-active'));
-        modal.find('#saveAction-' + source_action_id).click(function () {
-            let paramsTable = modal.find('#actionParamsTable-' + source_action_id);
+        let sourceActionId = parseInt(parts[1]);
+        modal.find('#cancelSaveActionIcon-' + sourceActionId).click(() => modal.removeClass('is-active'));
+        modal.find('#cancelSaveAction-' + sourceActionId).click(() => modal.removeClass('is-active'));
+        modal.find('#saveAction-' + sourceActionId).click(function () {
+            let paramsTable = modal.find('#actionParamsTable-' + sourceActionId);
             let params = {};
             for (let inputField of paramsTable.find(':input')) {
                 params[inputField.name] = inputField.value
@@ -73,7 +80,7 @@ $(document).ready(function() {
                 {
                     "source_id": $('#sourceId').val().toString(),
                     "action_id": modal.find('#actionId').val(),
-                    "source_action_id": source_action_id,
+                    "source_action_id": sourceActionId,
                     "params": JSON.stringify(params),
                 },
                 function () {
@@ -87,10 +94,10 @@ $(document).ready(function() {
     for (let configureActionButton of configureActionButtons) {
         $('#' + configureActionButton.id).click(function () {
             let parts = configureActionButton.id.split('-');
-            let source_action_id = parseInt(parts[1]);
+            let sourceActionId = parseInt(parts[1]);
             // TODO: params validation
-            let params_config = $('#actionParamsConfig-' + source_action_id).val();
-            let modal = $('#actionModal-' + source_action_id)
+            let paramsConfig = $('#actionParamsConfig-' + sourceActionId).val();
+            let modal = $('#actionModal-' + sourceActionId)
             modal.addClass('is-active');
         });
     }
@@ -106,7 +113,7 @@ $(document).ready(function() {
             let name = modal.find('#addSourceName').val();
             let description = modal.find('#addSourceDescription').val();
             let remote = modal.find('#addSourceRemote').val();
-            let scraper_id = modal.find('#addSourceScraperId').val();
+            let scraperId = modal.find('#addSourceScraperId').val();
             let params = modal.find('#addSourceParams').val();
             try {
                 $.parseJSON(params);
@@ -116,7 +123,7 @@ $(document).ready(function() {
                         "name": name,
                         "description": description,
                         "remote": remote,
-                        "scraper_id": scraper_id,
+                        "scraper_id": scraperId,
                         "params": params
                     },
                     () => modal.removeClass('is-active')
@@ -134,11 +141,11 @@ $(document).ready(function() {
         $('#' + deleteSourceButton.id).click(function () {
             if (confirm("Do you want to delete this source?")) {
                 let parts = deleteSourceButton.id.split('-');
-                let source_id = parseInt(parts[1]);
+                let sourceId = parseInt(parts[1]);
                 $.post(
                     "/source",
                     {
-                        "source_id": source_id,
+                        "source_id": sourceId,
                         "delete": true
                     },
                     () => location.reload()
@@ -153,12 +160,12 @@ $(document).ready(function() {
         $('#' + deleteActionButton.id).click(function () {
             if (confirm("Do you want to delete this action?")) {
                 let parts = deleteActionButton.id.split('-');
-                let source_action_id = parseInt(parts[1]);
+                let sourceActionId = parseInt(parts[1]);
                 $.post(
                     "/action",
                     {
                         "source_id": $('#sourceId').val().toString(),
-                        "source_action_id": source_action_id,
+                        "source_action_id": sourceActionId,
                         "delete": true
                     },
                     () => location.reload()

@@ -1,4 +1,5 @@
-from typing import Any
+from typing import Any, List
+import configparser
 from email.message import EmailMessage
 from smtplib import SMTP
 
@@ -30,3 +31,12 @@ class EmailAction(BaseAction):
         server.sendmail(self.username, self.recipients, email.as_string())
         server.quit()
 
+class DefaultEmailAction(EmailAction):
+    def __init__(self, config: configparser.ConfigParser, recipients: List[str]) -> None:
+        super().__init__(
+            hostname=config.get('smtp', 'hostname'),
+            port=config.getint('smtp', 'port'),
+            username=config.getint('smtp', 'username'),
+            password=config.get('smtp', 'password'),
+            recipients=recipients,
+        )
