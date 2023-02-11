@@ -71,9 +71,18 @@ $(document).ready(function() {
         modal.find('#cancelSaveAction-' + sourceActionId).click(() => modal.removeClass('is-active'));
         modal.find('#saveAction-' + sourceActionId).click(function () {
             let paramsTable = modal.find('#actionParamsTable-' + sourceActionId);
+            let paramsConfig = {}
+            for (let paramConfig of modal.find('[id^="actionParamConfig-"]')) {
+                let parts = paramConfig.id.split('-');
+                paramsConfig[parts[1]] = paramConfig.value;
+            }
             let params = {};
             for (let inputField of paramsTable.find(':input')) {
-                params[inputField.name] = inputField.value;
+                if (paramsConfig[inputField.name] === "list") {
+                    params[inputField.name] = inputField.value.replace(/\s/g, '').split(',');
+                } else {
+                    params[inputField.name] = inputField.value;
+                }
             }
             $.post(
                 "/action",
@@ -95,8 +104,6 @@ $(document).ready(function() {
         $('#' + configureActionButton.id).click(function () {
             let parts = configureActionButton.id.split('-');
             let sourceActionId = parseInt(parts[1]);
-            // TODO: params validation
-            let paramsConfig = $('#actionParamsConfig-' + sourceActionId).val();
             let modal = $('#actionModal-' + sourceActionId)
             modal.addClass('is-active');
         });

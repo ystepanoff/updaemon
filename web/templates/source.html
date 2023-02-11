@@ -97,7 +97,6 @@
                     {{ action.base_class }}
                 </td>
                 <td>
-                    <input id="actionParamsConfig-{{ action.source_action_id }}" type="hidden" value="{{ action.params_config }}" />
                     <button id="configureActionButton-{{ action.source_action_id }}" class="button is-fullwidth">Configure action</button>
                 </td>
                 <td class="has-text-centered"><button id="deleteActionButton-{{ action.source_action_id }}" class="delete is-medium"></button></td>
@@ -129,8 +128,11 @@
                             <tr>
                                 <td>{{ param }}:</td>
                                 <td>
+                                    <input id="actionParamConfig-{{ param }}" type="hidden" value="{{ action.params_config[param] }}" />
                                     {% if param in ['password', 'secret'] %}
                                     <input id="actionParam-{{ param }}" class="input" type="password" name="{{ param }}" placeholder="leave blank to use existing" />
+                                    {% elif action.params_config[param] == 'list' %}
+                                    <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ ', '.join(action.params[param]) }}"/>
                                     {% else %}
                                     <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ action.params[param] }}"/>
                                     {% endif %}
