@@ -92,7 +92,9 @@ class Source:
                 'user_id': user_id,
             })
             if cur.rowcount > 0:
-                return Source(*cur.fetchone())
+                source = Source(*cur.fetchone())
+                source.params = json.loads(source.params)
+                return source
         return None
 
     @classmethod

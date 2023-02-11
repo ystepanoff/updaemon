@@ -77,13 +77,19 @@
                                     </div>
                                 </td>
                             </tr>
+                        </tbody>
+                        {% for base_scraper in base_scrapers %}
+                        <tbody id="scraperParams-{{ base_scraper.id }}" class="is-hidden">
+                            {% for param in base_scraper.params_order %}
                             <tr>
-                                <td>Scraper params:</td>
+                                <td>{{ param }}:</td>
                                 <td>
-                                    <textarea id="addSourceParams" class="textarea" placeholder="{}"></textarea>
+                                    <input id="scraperParam-{{ param }}" class="input" type="text" name="{{ param }}"/>
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
+                        {% endfor %}
                     </table>
                 </div>
             </section>

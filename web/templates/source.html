@@ -48,13 +48,19 @@
         </tbody>
 
         {% for base_scraper in base_scrapers %}
-        <tbody id="scraperParams-{{ base_scraper.id }}" {% if base_scraper.id != source.scraper_id %}class="is-hidden"{% endif %}>
+        <tbody id="scraperParams-{{ base_scraper.id }}" {% if base_scraper.id != source.scraper_id %}  class="is-hidden"{% endif %}>
             {% for param in base_scraper.params_order %}
             <tr>
                 <td></td>
                 <td>{{ param }}:</td>
                 <td>
-                    <input id="scraperParam-{{ param }}" class="input" type="text" name="{{ param }}"/>
+                    <input
+                            id="scraperParam-{{ param }}"
+                            class="input"
+                            type="text"
+                            name="{{ param }}"
+                            {% if base_scraper.id == source.scraper_id %} value="{{ source.params[param] }}" {% endif %}
+                    />
                 </td>
             </tr>
             {% endfor %}

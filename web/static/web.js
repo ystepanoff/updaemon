@@ -12,10 +12,10 @@ $(document).ready(function() {
         let saveSourceSuccess = $('#saveSourceSuccess');
         let sourceScraperId = $('#sourceScraperId').val();
         saveSourceButton.click(function () {
-        let params = {};
-        for (let inputField of $('#scraperParams-' + sourceScraperId).find(':input')) {
-            params[inputField.name] = inputField.value;
-        }
+            let params = {};
+            for (let inputField of $('#scraperParams-' + sourceScraperId).find(':input')) {
+                params[inputField.name] = inputField.value;
+            }
             $.post(
                 "/source",
                 {
@@ -73,7 +73,7 @@ $(document).ready(function() {
             let paramsTable = modal.find('#actionParamsTable-' + sourceActionId);
             let params = {};
             for (let inputField of paramsTable.find(':input')) {
-                params[inputField.name] = inputField.value
+                params[inputField.name] = inputField.value;
             }
             $.post(
                 "/action",
@@ -104,36 +104,54 @@ $(document).ready(function() {
 
     if (addSourceButton.length) {
         let modal = $('#addSourceModal');
+        let scraperSelect = modal.find('#addSourceScraperId');
+        let scraperId = parseInt(scraperSelect.val());
+        for (let scraperParams of $('[id^="scraperParams-"]')) {
+            let parts = scraperParams.id.split('-');
+            let scraperParamsId = parseInt(parts[1]);
+            if (scraperParamsId === scraperId) {
+                $('#' + scraperParams.id).removeClass('is-hidden');
+            }
+        }
         modal.find('#addSourceCancel').click(() => modal.removeClass('is-active'));
         modal.find('#addSourceCancelIcon').click(() => modal.removeClass('is-active'));
         addSourceButton.click(function () {
             modal.addClass('is-active');
         });
+        modal.find('#addSourceScraperId').change(function () {
+            let newScraperId = parseInt(scraperSelect.val());
+            for (let scraperParams of $('[id^="scraperParams-"]')) {
+                let parts = scraperParams.id.split('-');
+                let scraperParamsId = parseInt(parts[1]);
+                if (scraperParamsId === newScraperId) {
+                    $('#' + scraperParams.id).removeClass('is-hidden');
+                } else {
+                    $('#' + scraperParams.id).addClass('is-hidden');
+                }
+            }
+        });
         modal.find('#addSourceSave').click(function () {
             let name = modal.find('#addSourceName').val();
             let description = modal.find('#addSourceDescription').val();
             let remote = modal.find('#addSourceRemote').val();
-            let scraperId = modal.find('#addSourceScraperId').val();
-            let params = modal.find('#addSourceParams').val();
-            try {
-                $.parseJSON(params);
-                $.post(
-                    "/source",
-                    {
-                        "name": name,
-                        "description": description,
-                        "remote": remote,
-                        "scraper_id": scraperId,
-                        "params": params
-                    },
-                    () => modal.removeClass('is-active')
-                ).done(() => location.reload()).fail(function (xhr, status, error) {
-                    alert(error);
-                    modal.removeClass('is-active');
-                });
-            } catch (exception) {
-                alert(exception.toString());
+            let params = {};
+            for (let inputField of $('#scraperParams-' + scraperSelect.val()).find(':input')) {
+                params[inputField.name] = inputField.value;
             }
+            $.post(
+                "/source",
+                {
+                    "name": name,
+                    "description": description,
+                    "remote": remote,
+                    "scraper_id": scraperSelect.val(),
+                    "params": JSON.stringify(params)
+                },
+                () => modal.removeClass('is-active')
+            ).done(() => location.reload()).fail(function (xhr, status, error) {
+                alert(error);
+                modal.removeClass('is-active');
+            });
         });
     }
 
@@ -188,7 +206,7 @@ $(document).ready(function() {
             let paramsTable = modal.find('#addActionParamsTable-' + baseClassId);
             let params = {};
             for (let inputField of paramsTable.find(':input')) {
-                params[inputField.name] = inputField.value
+                params[inputField.name] = inputField.value;
             }
             $.post(
                 "/action",

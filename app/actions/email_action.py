@@ -9,7 +9,7 @@ from actions.base_action import BaseAction
 class EmailAction(BaseAction):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.recipients = kwargs.get('recipients', [])
+        self.recipient = kwargs.get('recipient', '')
         self.hostname = kwargs.get('hostname', 'localhost')
         self.port = kwargs.get('port', 25)
         self.username = kwargs.get('username')
@@ -18,7 +18,7 @@ class EmailAction(BaseAction):
     async def action(self, meta: str, message: str) -> None:
         email = EmailMessage()
         email['From'] = self.username
-        email['To'] = ', '.join(self.recipients)
+        email['To'] = self.recipient
         email['Subject'] = meta
         email.set_content(message)
 
@@ -28,15 +28,15 @@ class EmailAction(BaseAction):
         server.starttls()
         server.ehlo()
         server.login(self.username, self.password)
-        server.sendmail(self.username, self.recipients, email.as_string())
+        server.sendmail(self.username, self.recipient, email.as_string())
         server.quit()
 
 class DefaultEmailAction(EmailAction):
-    def __init__(self, config: configparser.ConfigParser, recipients: List[str]) -> None:
+    def __init__(self, config: configparser.ConfigParser, recipient: str) -> None:
         super().__init__(
             hostname=config.get('smtp', 'hostname'),
             port=config.getint('smtp', 'port'),
             username=config.getint('smtp', 'username'),
             password=config.get('smtp', 'password'),
-            recipients=recipients,
+            recipient=recipient,
         )
