@@ -20,6 +20,7 @@
                 <th>Remote</th>
             </tr>
         </thead>
+
         <tbody>
             <tr>
                 <td><input id="sourceName" class="input" type="text" name="name" value="{{ source.name }}" /></td>
@@ -44,14 +45,29 @@
                 </td>
                 <td></td>
             </tr>
+        </tbody>
 
+        {% for base_scraper in base_scrapers %}
+        <tbody id="scraperParams-{{ base_scraper.id }}" {% if base_scraper.id != source.scraper_id %}  class="is-hidden"{% endif %}>
+            {% for param in base_scraper.params_order %}
             <tr>
-                <td>Scraper params:</td>
-                <td colspan="2">
-                    <textarea id="sourceParams" class="textarea" name="params">{{ source.params }}</textarea>
+                <td></td>
+                <td>{{ param }}:</td>
+                <td>
+                    <input
+                            id="scraperParam-{{ param }}"
+                            class="input"
+                            type="text"
+                            name="{{ param }}"
+                            {% if base_scraper.id == source.scraper_id %} value="{{ source.params[param] }}" {% endif %}
+                    />
                 </td>
             </tr>
+            {% endfor %}
+        </tbody>
+        {% endfor %}
 
+        <tfoot>
             <tr>
                 <td></td>
                 <td></td>
@@ -59,7 +75,7 @@
                     <button id="saveSourceButton" class="button">Save source</button>
                 </td>
             </tr>
-        </tbody>
+        </tfoot>
     </table>
 </div>
 <h1 class="title">
@@ -81,7 +97,6 @@
                     {{ action.base_class }}
                 </td>
                 <td>
-                    <input id="actionParamsConfig-{{ action.source_action_id }}" type="hidden" value="{{ action.params_config }}" />
                     <button id="configureActionButton-{{ action.source_action_id }}" class="button is-fullwidth">Configure action</button>
                 </td>
                 <td class="has-text-centered"><button id="deleteActionButton-{{ action.source_action_id }}" class="delete is-medium"></button></td>
@@ -107,7 +122,25 @@
             </header>
             <section class="modal-card-body">
                 <div class="content has-text-black">
-                    <textarea id="actionParams-{{ action.source_action_id }}" class="textarea" placeholder="{}">{{ action.params }}</textarea>
+                    <table id="actionParamsTable-{{ action.source_action_id }}" class="table">
+                        <tbody>
+                            {% for param in action.params_order %}
+                            <tr>
+                                <td>{{ param }}:</td>
+                                <td>
+                                    <input id="actionParamConfig-{{ param }}" type="hidden" value="{{ action.params_config[param] }}" />
+                                    {% if param in ['password', 'secret'] %}
+                                    <input id="actionParam-{{ param }}" class="input" type="password" name="{{ param }}" placeholder="leave blank to use existing" />
+                                    {% elif action.params_config[param] == 'list' %}
+                                    <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ ', '.join(action.params[param]) }}"/>
+                                    {% else %}
+                                    <input id="actionParam-{{ param }}" class="input" type="text" name="{{ param }}" value="{{ action.params[param] }}"/>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
                 </div>
             </section>
             <footer class="modal-card-foot">
@@ -127,7 +160,7 @@
             <section class="modal-card-body">
                 <div class="content has-text-black">
                     <table class="table">
-                        <tbody>
+                        <thead>
                             <tr>
                                 <td>Base action:</td>
                                 <td>
@@ -140,13 +173,26 @@
                                     </div>
                                 </td>
                             </tr>
+                        </thead>
+                        {% for base_action in base_actions %}
+                        <tbody id="addActionParamsTable-{{ base_action.id }}" class="is-hidden">
+                            {% for param in base_action.params_order %}
                             <tr>
-                                <td>Parameters:</td>
                                 <td>
-                                    <textarea id="addActionParams" class="textarea" placeholder="{}"></textarea>
+                                    <input id="addActionParamConfig-{{ param }}" type="hidden" value="{{ base_action.params_config[param] }}" />
+                                    {{ param }}:
+                                </td>
+                                <td>
+                                    {% if param in ['password', 'secret'] %}
+                                    <input id="addActionParam-{{ param }}" class="input" type="password" name="{{ param }}"/>
+                                    {% else %}
+                                    <input id="addActionParam-{{ param }}" class="input" type="text" name="{{ param }}"/>
+                                    {% endif %}
                                 </td>
                             </tr>
+                            {% endfor %}
                         </tbody>
+                        {% endfor %}
                     </table>
                 </div>
             </section>

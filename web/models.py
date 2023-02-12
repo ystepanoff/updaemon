@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Optional, List, Dict, Any
-from flask_login import UserMixin
 import json
+
+from flask_login import UserMixin
 
 from . import db
 
@@ -92,7 +93,9 @@ class Source:
                 'user_id': user_id,
             })
             if cur.rowcount > 0:
-                return Source(*cur.fetchone())
+                source = Source(*cur.fetchone())
+                source.params = json.loads(source.params)
+                return source
         return None
 
     @classmethod
@@ -100,7 +103,12 @@ class Source:
         with db.get_db().cursor() as cur:
             cur.execute("""
                 SELECT
-                    action.id, action.base_class, COALESCE(action.params_config, '{}'), source_action.id, source_action.params
+                    action.id,
+                    action.base_class,
+                    COALESCE(action.params_config, '{}'),
+                    COALESCE(action.params_order, '{}'),
+                    source_action.id,
+                    source_action.params
                 FROM action
                 INNER JOIN source_action
                 ON action.id = source_action.action_id
@@ -115,9 +123,10 @@ class Source:
                     'id': action_id,
                     'base_class': base_class,
                     'source_action_id': source_action_id,
-                    'params_config': params_config,
-                    'params': params,
-                } for action_id, base_class, params_config, source_action_id, params in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                    'params': json.loads(params),
+                } for action_id, base_class, params_config, params_order, source_action_id, params in cur.fetchall()
             ]
 
     def update(self, source_id: int) -> None:
@@ -145,6 +154,7 @@ class Source:
     def delete(self, source_id: int) -> None:
         with db.get_db().cursor() as cur:
             cur.execute("DELETE FROM source_action WHERE source_id = %s", source_id)
+            cur.execute("DELETE FROM state WHERE source_id = %s", source_id)
             cur.execute("DELETE FROM source WHERE id = %s", source_id)
 
     def save(self):
@@ -172,12 +182,14 @@ class Action:
     @classmethod
     def list_base_actions(cls):
         with db.get_db().cursor() as cur:
-            cur.execute("SELECT id, base_class FROM action")
+            cur.execute("SELECT id, base_class, COALESCE(params_config, '{}'), COALESCE(params_order, '{}') FROM action")
             return [
                 {
                     'id': action_id,
                     'base_class': base_class,
-                } for action_id, base_class in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                } for action_id, base_class, params_config, params_order in cur.fetchall()
             ]
 
 
@@ -201,7 +213,8 @@ class SourceAction:
                 'user_id': user_id,
             })
             if cur.rowcount > 0:
-                return SourceAction(*cur.fetchone())
+                source_id, action_id, params = cur.fetchone()
+                return SourceAction(source_id, action_id, json.loads(params))
         return None
 
     def update(self, source_action_id: int) -> None:
@@ -245,11 +258,12 @@ class Scraper:
     @classmethod
     def list_base_scrapers(cls):
         with db.get_db().cursor() as cur:
-            cur.execute("SELECT id, base_class, params_config FROM scraper")
+            cur.execute("SELECT id, base_class, params_config, params_order FROM scraper")
             return [
                 {
                     'id': scraper_id,
                     'base_class': base_class,
-                    'params_config': params_config,
-                } for scraper_id, base_class, params_config in cur.fetchall()
+                    'params_config': json.loads(params_config),
+                    'params_order': json.loads(params_order),
+                } for scraper_id, base_class, params_config, params_order in cur.fetchall()
             ]
