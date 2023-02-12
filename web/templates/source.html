@@ -178,7 +178,10 @@
                         <tbody id="addActionParamsTable-{{ base_action.id }}" class="is-hidden">
                             {% for param in base_action.params_order %}
                             <tr>
-                                <td>{{ param }}:</td>
+                                <td>
+                                    <input id="addActionParamConfig-{{ param }}" type="hidden" value="{{ base_action.params_config[param] }}" />
+                                    {{ param }}:
+                                </td>
                                 <td>
                                     {% if param in ['password', 'secret'] %}
                                     <input id="addActionParam-{{ param }}" class="input" type="password" name="{{ param }}"/>
