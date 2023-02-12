@@ -15,7 +15,9 @@ import scrapers
 
 def has_updated(new_state: str, old_state: str) -> bool:
     if old_state is None:
-        return True
+        old_state = ''
+    if new_state is None:
+        new_state = ''
     new_hash = sha512(new_state.encode('utf-8')).hexdigest()
     old_hash = sha512(old_state.encode('utf-8')).hexdigest()
     return new_hash != old_hash
