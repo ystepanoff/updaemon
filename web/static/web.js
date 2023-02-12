@@ -208,17 +208,15 @@ $(document).ready(function() {
         addActionButton.click(function () {
             modal.addClass('is-active');
         });
-        $('#addActionBaseClass').change(function () {
-            for (let actionParamsTable of $('[id^="addActionParamsTable-"]')) {
-                let parts = actionParamsTable.id.split('-');
-                let baseClassId = parseInt(parts[1]);
-                if (baseClassId === parseInt($('#addActionBaseClass').val())) {
-                    $('#' + actionParamsTable.id).removeClass('is-hidden');
-                } else {
-                    $('#' + actionParamsTable.id).addClass('is-hidden');
-                }
+        for (let actionParamsTable of $('[id^="addActionParamsTable-"]')) {
+            let parts = actionParamsTable.id.split('-');
+            let baseClassId = parseInt(parts[1]);
+            if (baseClassId === parseInt($('#addActionBaseClass').val())) {
+                $('#' + actionParamsTable.id).removeClass('is-hidden');
+            } else {
+                $('#' + actionParamsTable.id).addClass('is-hidden');
             }
-        });
+        }
         modal.find('#addActionSave').click(function () {
             let baseClassId = parseInt(modal.find('#addActionBaseClass').val());
             let paramsTable = modal.find('#addActionParamsTable-' + baseClassId);
