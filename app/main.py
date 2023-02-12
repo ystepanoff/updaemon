@@ -53,8 +53,8 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any], config: 
                         message='Updated: {}'.format(source['remote']),
                     )
                 except Exception as exception:
+                    logging.error('Source id: %s, action %s, exception:')
                     traceback.print_exc()
-                    logging.error('Source %s action %s: %s', source_id, base_class, str(exception))
             await db_handler.upsert_state(source_id, new_state)
     except AttributeError:
         traceback.print_exc()

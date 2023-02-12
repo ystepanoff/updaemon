@@ -9,7 +9,7 @@ from actions.base_action import BaseAction
 class EmailAction(BaseAction):
     def __init__(self, **kwargs: Any) -> None:
         super().__init__(**kwargs)
-        self.recipients = kwargs.get('recipients', '')
+        self.recipients = kwargs.get('recipients', [])
         self.hostname = kwargs.get('hostname', 'localhost')
         self.port = kwargs.get('port', 25)
         self.username = kwargs.get('username')

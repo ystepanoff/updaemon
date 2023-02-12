@@ -1,7 +1,8 @@
 from __future__ import annotations
 from typing import Optional, List, Dict, Any
-from flask_login import UserMixin
 import json
+
+from flask_login import UserMixin
 
 from . import db
 
