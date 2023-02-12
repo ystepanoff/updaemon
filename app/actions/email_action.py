@@ -36,7 +36,7 @@ class DefaultEmailAction(EmailAction):
         super().__init__(
             hostname=config.get('smtp', 'hostname'),
             port=config.getint('smtp', 'port'),
-            username=config.getint('smtp', 'username'),
+            username=config.get('smtp', 'username'),
             password=config.get('smtp', 'password'),
             recipients=recipients,
         )
