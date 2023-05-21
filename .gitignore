@@ -1,4 +1,5 @@
 updaemon.conf
+docker-compose.yml
 docker-compose.yaml
 
 .idea

@@ -85,7 +85,7 @@ class DBHandler:
 
     async def latest_state(self, source_id: int) -> Optional[Dict[str, Any]]:
         state = {
-            'data': None,
+            'data': '',
             'updated_at': None,
         }
         async with self.pool.acquire() as conn:

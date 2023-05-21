@@ -179,7 +179,7 @@
                             {% for param in base_action.params_order %}
                             <tr>
                                 <td>
-                                    <input id="addActionParamConfig-{{ param }}" type="hidden" value="{{ base_action.params_config[param] }}" />
+                                    <input id="addActionParamConfig-{{ param }}" type="hidden" name="{{ param }}" value="{{ base_action.params_config[param] }}" />
                                     {{ param }}:
                                 </td>
                                 <td>
