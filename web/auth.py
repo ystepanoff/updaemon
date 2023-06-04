@@ -33,30 +33,25 @@ def signup() -> str:
     return render_template('signup.html')
 
 
-# # Note: this is not planned to be rolled out in the nearest future.
-# @auth.route('/signup', methods=['POST'])
-# def signup_post():
-#     email = request.args.get('email')
-#     password = request.args.get('password')
-#     name = request.args.get('name')
-#
-#     print(email, password, name)
-#
-#     user = User(
-#         email=email,
-#         password=generate_password_hash(password, method='sha256'),
-#         name=name,
-#     )
-#
-#     print(user.exists())
-#
-#     if user.exists():
-#         flash('User with the specified e-mail address already exists')
-#         return redirect(url_for('auth.signup'))
-#
-#     user.persist()
-#
-#     return redirect(url_for('auth.login'))
+@auth.route('/signup', methods=['POST'])
+def signup_post():
+    email = request.form.get('email')
+    password = request.form.get('password')
+    name = request.form.get('name')
+
+    user = User(
+        email=email,
+        password=generate_password_hash(password, method='sha256'),
+        name=name,
+    )
+
+    if user.exists():
+        flash('User with the specified e-mail address already exists')
+        return redirect(url_for('auth.signup'))
+
+    user.persist()
+
+    return redirect(url_for('auth.login'))
 
 
 @auth.route('/logout')
