@@ -60,7 +60,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any], config: 
                         message=message,
                     )
                 except Exception as exception:
-                    logging.error('Source id: %s, action %s, exception:', str(exception))
+                    logging.error('Source id: %s, action %s, exception: %s', source_id, action, str(exception))
                     traceback.print_exc()
             await db_handler.upsert_state(source_id, new_state)
     except AttributeError:
