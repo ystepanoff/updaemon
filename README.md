@@ -3,7 +3,36 @@
 
 # updaemon: monitoring web sources and getting notified
 
-Current version can be accessed at [https://updaemon.online](https://updaemon.online).
-
 ![](https://i.imgur.com/INQyb8C.png)
 
+# Installation
+
+```
+$ git clone https://github.com/ystepanoff/updaemon
+$ cd updaemon
+$ mv updaemon.example.conf updaemon.conf
+$ mv docker-compose.example.yaml docker-compose.yaml
+```
+
+Populate `updaemon.conf` and `docker-compose.yaml` with the relevant configuration options. Make sure the MySQL passwords in both files are the same.
+
+```
+$ docker compose build
+$ docker compose up -d
+```
+
+Configure reverse proxy (below is an example Nginx configuration):
+
+```
+server {
+    listen 8080;
+    listen [::]:8080;
+
+    server_name your-server;
+
+    location / {
+        proxy_pass http://127.0.0.1:5000;
+        include proxy_params;
+    }
+}
+```
