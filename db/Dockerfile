@@ -9,17 +9,10 @@ RUN apt-get -qq -y update \
     && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
     && localedef -i en_GB -c -f UTF-8 -A /usr/share/locale/locale.alias en_GB.UTF-8
 
-COPY . /opt/updaemon
-WORKDIR /opt/updaemon
-
 RUN pip3 install --no-cache-dir -q -U virtualenv
 ENV VIRTUALENV /opt/venv
 RUN virtualenv -p python3 $VIRTUALENV
 
-COPY requirements.txt /tmp/
-RUN . /opt/venv/bin/activate && pip install --no-cache-dir -q -r /tmp/requirements.txt
-
-ADD crontab /etc/cron.d/updaemon
-RUN chmod 0644 /etc/cron.d/updaemon
-
-RUN touch /var/log/cron.log
+COPY ./db /opt/db/
+COPY ./updaemon.conf /opt/db/updaemon.conf
+RUN . /opt/venv/bin/activate && pip install --no-cache-dir -q -r /opt/db/requirements.txt

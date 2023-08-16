@@ -7,7 +7,6 @@ import traceback
 import sys
 from difflib import unified_diff
 from hashlib import sha512
-from zc.lockfile import LockFile, LockError
 
 from utils.db_handler import DBParams, DBHandler
 import actions
@@ -61,7 +60,7 @@ async def process_source(db_handler: DBHandler, source: Dict[str, Any], config: 
                         message=message,
                     )
                 except Exception as exception:
-                    logging.error('Source id: %s, action %s, exception:')
+                    logging.error('Source id: %s, action %s, exception: %s', source_id, action, str(exception))
                     traceback.print_exc()
             await db_handler.upsert_state(source_id, new_state)
     except AttributeError:
@@ -80,12 +79,6 @@ async def main() -> None:
         level=logging.DEBUG,
         format='[%(asctime)s] %(levelname)s - %(message)s',
     )
-
-    try:
-        lock = LockFile('.lock')
-    except LockError:
-        logging.error('Cannot obtain lock — is the app already running?')
-        sys.exit(0)
 
     db_handler = DBHandler(
         params=DBParams(
@@ -106,7 +99,6 @@ async def main() -> None:
     await asyncio.gather(*tasks)
 
     await db_handler.destroy()
-    lock.close()
 
 
 if __name__ == '__main__':

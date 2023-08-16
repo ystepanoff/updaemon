@@ -1,16 +1,30 @@
+version: '3.4'
+
+configs:
+  mysql_init:
+    file: ./init.sql
+
+
 services:
   updaemon-db:
     image: mysql:5.7.37-debian
+    configs:
+      - source: mysql_init
+        target: /var/opt/init.sql
     platform: linux/amd64
     user: "1000:50"
+    command: --init-file /var/opt/init.sql
     volumes:
       - updaemon-data:/var/lib/mysql
     environment:
+      - MYSQL_DATABASE=updaemon
       - MYSQL_ROOT_PASSWORD=<root password>
 
   run-migrations:
-    image: debian:stable
-    command: bash -c ". /opt/updaemon/wait-for updaemon-db:3306 -- /opt/venv/bin/python /opt/updaemon/db/run_migrations.py --config updaemon.conf --dir /opt/updaemon/db/migrations"
+    build:
+      context: ./
+      dockerfile: ./db/Dockerfile
+    command: bash -c ". /opt/updaemon/wait-for updaemon-db:3306 -- /opt/venv/bin/python /opt/db/run_migrations.py --config /opt/db/updaemon.conf --dir /opt/db/migrations"
     depends_on:
       - updaemon-db
     volumes:
@@ -19,7 +33,7 @@ services:
   updaemon:
     build: .
     command: bash -c "cron && tail -F /var/log/cron.log"
-    image: debian:stable
+    image: debian:buster
     depends_on:
       - updaemon-db
       - run-migrations
