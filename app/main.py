@@ -99,7 +99,6 @@ async def main() -> None:
     await asyncio.gather(*tasks)
 
     await db_handler.destroy()
-    lock.close()
 
 
 if __name__ == '__main__':
