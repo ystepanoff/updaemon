@@ -78,6 +78,9 @@ $(document).ready(function() {
             }
             let params = {};
             for (let inputField of paramsTable.find(':input')) {
+                if (inputField.type === "hidden") {
+                    continue;
+                }
                 if (paramsConfig[inputField.name] === "list") {
                     params[inputField.name] = inputField.value.replace(/\s/g, '').split(',');
                 } else {
