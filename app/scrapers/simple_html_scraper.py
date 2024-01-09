@@ -19,6 +19,6 @@ class SimpleHTMLScraper(BaseScraper):
         response = requests.get(self.__remote, timeout=timeout)
         if response.status_code == 200:
             return self.__process(response.text)
-        self.logger.error('Failed to fetch: %d, attempts left: %s.', response.status_code, attempts)
+        self.__logger.error('Failed to fetch: %d, attempts left: %s.', response.status_code, attempts)
         if attempts > 0:
-            return await self.scrape(attempts - 1)
+            return await self.scrape(attempts - 1, timeout)
